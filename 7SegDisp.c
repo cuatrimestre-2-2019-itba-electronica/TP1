@@ -12,6 +12,8 @@ static uint8_t pinCsGdp;
 static uint8_t pinSe10;
 static uint8_t pinSe11;
 static uint32_t SysTickFrec;
+static uint8_t current7Seg=0;//7 segmento que se esta senalando en el momento
+static uint32_t prescalerMultiplexor;
 
 /* Masks */
 
@@ -38,6 +40,8 @@ static uint32_t SysTickFrec;
 
 #define display_CSEGDP_Pos          7U
 #define display_CSEGDP_Msk 			(1UL << display_CSEGDP_Pos)
+
+#define FREC_MULTIPLEXOR	1000U //frecuencia con las que se cambia de digito
 
 /**
  * @brief turn an int into a 7seg pin state
@@ -108,8 +112,8 @@ void setMux(uint8_t disp){
 	if(disp>3){
 		disp=3;
 	}
-	bool s0 [4]={LOW,LOW,HIGH,HIGH};
-	bool s1 [4]={LOW,HIGH,LOW,HIGH};
+	bool s0 [4]={HIGH,HIGH,LOW,LOW};
+	bool s1 [4]={HIGH,LOW,HIGH,LOW};
 	gpioWrite(pinSe10,s0[disp]);
 	gpioWrite(pinSe11,s1[disp]);
 }
@@ -126,7 +130,7 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 	pinSe10=_pinSe10;
 	pinSe11=_pinCsSe11;
 	SysTickFrec=_SysTickFrec;
-
+	prescalerMultiplexor=SysTickFrec/FREC_MULTIPLEXOR;
 
 	gpioMode(pinCsGa, OUTPUT);
 	gpioMode(pinCsGb, OUTPUT);
@@ -139,7 +143,7 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 	gpioMode(pinSe10, OUTPUT);
 	gpioMode(pinSe11, OUTPUT);
 
-	for(int i=0;i<3;i++){//SACAR para pruebas nomas, seteo los display en 0 1 2 3
+	for(int i=0;i<4;i++){//SACAR para pruebas nomas, seteo los display en 0 1 2 3
 		cseg[i]=display_set_cseg(i);
 
 	}
@@ -148,13 +152,19 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 
 
 void IrqMultiplexor(void){
-	static uint8_t current7Seg=0;
-	setPinsState(cseg[current7Seg]);//prendo los pines correspondientes del 7 seg
-	setMux(current7Seg);
-	current7Seg++;//incremneto contador de 7 segmentos
-	if(current7Seg>3){//si supero los 3 entonces reinicio el contador
-		current7Seg=0;
+
+	static uint32_t CounterPrescaler=0;
+	//setPinsState(cseg[current7Seg]);//prendo los pines correspondientes del 7 seg
+	if((CounterPrescaler%=prescalerMultiplexor)==0){
+		setMux(current7Seg);
+		setPinsState(cseg[current7Seg]);
+		current7Seg++;//incremneto contador de 7 segmentos
+		current7Seg=current7Seg%4;
 	}
+	CounterPrescaler++;
+}
+
+void IrqBrightness(void){
 
 
 }

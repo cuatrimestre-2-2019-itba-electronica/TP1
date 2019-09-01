@@ -16,7 +16,7 @@
  * @brief when its called change de 7seg chosen
  */
 void IrqMultiplexor(void);
-
+void IrqBrightness(void);
 //*************************END_IRQ****************************
 
 //********************************************************
