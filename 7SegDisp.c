@@ -1,4 +1,6 @@
 #include "7SegDisp.h"
+#include <stdbool.h>
+#include<stdint.h>
 /* cseg register(?) */
 static uint8_t cseg[4];//pin values(HIGH O LOW) for each 7seg
 static uint8_t pinCsGa;
@@ -14,6 +16,8 @@ static uint8_t pinSe11;
 static uint32_t SysTickFrec;
 static uint8_t current7Seg=0;//7 segmento que se esta senalando en el momento
 static uint32_t prescalerMultiplexor;
+static uint32_t prescalerPwm;
+static uint8_t brightLevel=4;
 
 /* Masks */
 
@@ -42,6 +46,8 @@ static uint32_t prescalerMultiplexor;
 #define display_CSEGDP_Msk 			(1UL << display_CSEGDP_Pos)
 
 #define FREC_MULTIPLEXOR	1000U //frecuencia con las que se cambia de digito
+#define FREC_BRIGHTNESS	5000U
+#define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
 
 /**
  * @brief turn an int into a 7seg pin state
@@ -130,7 +136,9 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 	pinSe10=_pinSe10;
 	pinSe11=_pinCsSe11;
 	SysTickFrec=_SysTickFrec;
-	prescalerMultiplexor=SysTickFrec/FREC_MULTIPLEXOR;
+
+	prescalerMultiplexor=FREC_BRIGHTNESS/FREC_MULTIPLEXOR;
+	prescalerPwm=SysTickFrec/FREC_BRIGHTNESS;
 
 	gpioMode(pinCsGa, OUTPUT);
 	gpioMode(pinCsGb, OUTPUT);
@@ -142,6 +150,7 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 	gpioMode(pinCsGdp, OUTPUT);
 	gpioMode(pinSe10, OUTPUT);
 	gpioMode(pinSe11, OUTPUT);
+	setMux(0);//inicializo en rimer display el mux
 
 	for(int i=0;i<4;i++){//SACAR para pruebas nomas, seteo los display en 0 1 2 3
 		cseg[i]=display_set_cseg(i);
@@ -152,19 +161,78 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 
 
 void IrqMultiplexor(void){
-
 	static uint32_t CounterPrescaler=0;
 	//setPinsState(cseg[current7Seg]);//prendo los pines correspondientes del 7 seg
-	if((CounterPrescaler%=prescalerMultiplexor)==0){
-		setMux(current7Seg);
+	if(((CounterPrescaler%prescalerMultiplexor)==0)){
+
 		setPinsState(cseg[current7Seg]);
+		setMux(current7Seg);
 		current7Seg++;//incremneto contador de 7 segmentos
 		current7Seg=current7Seg%4;
+
 	}
+	CounterPrescaler%=prescalerMultiplexor;
 	CounterPrescaler++;
 }
-
+/*
 void IrqBrightness(void){
+	static uint32_t CounterPrescaler=0;
+	static uint8_t levelCount=0;
+	static uint8_t wasSetOn=0;
+	static uint8_t wasSetOff=0;
+	CounterPrescaler++;
+	if((CounterPrescaler%=prescalerBright)==0){
+		if(levelCount<brightLevel && !wasSetOn){
+			setPinsState(cseg[current7Seg]);
+			wasSetOn=1;
+		}else if(!wasSetOff){
+			setPinsState(0);
+			wasSetOff=1;
+		}
+		levelCount++;
+		if((levelCount%=BRIGHT_LEVEL)== 0){
+			wasSetOn=0;
+			wasSetOff=0;
+		}
+	}
 
 
+}
+*/
+void IrqAllInclusive(void){
+	static uint32_t CounterPrescalerPwm=0;
+	static uint32_t CounterPrescalerMux=0;
+	static uint32_t currentPeriod=0;
+	static uint8_t turnOnOnce=0;
+	static uint8_t turnOffOnce=0;
+	static uint8_t lastDigit=0;
+
+	if((CounterPrescalerPwm%=prescalerPwm)==0){ //divicion del clock para el PWM
+		if((currentPeriod<brightLevel)&&(!turnOnOnce)){
+			setPinsState(cseg[lastDigit]);
+			turnOnOnce=1;
+		}else if(!turnOffOnce){
+			setPinsState(0);
+			turnOffOnce=1;
+		}
+		if((currentPeriod%=BRIGHT_LEVEL)==0){
+			turnOnOnce=0;
+			turnOffOnce=0;
+		}
+
+		if((CounterPrescalerMux%=prescalerMultiplexor)==0){ // divicion del clock para el multiplexeo de los 7 segmentos
+			setMux(current7Seg);
+			if(!turnOffOnce){
+				setPinsState(cseg[current7Seg]);
+			}
+			//setPinsState(cseg[current7Seg]);
+			lastDigit=current7Seg;
+			current7Seg++;
+			current7Seg=current7Seg%4;
+			//lastDigit=current7Seg;
+		}
+		CounterPrescalerMux++;
+		currentPeriod++;
+	}
+	CounterPrescalerPwm++;
 }

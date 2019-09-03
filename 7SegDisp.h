@@ -17,6 +17,7 @@
  */
 void IrqMultiplexor(void);
 void IrqBrightness(void);
+void IrqAllInclusive(void);
 //*************************END_IRQ****************************
 
 //********************************************************
@@ -28,6 +29,8 @@ void IrqBrightness(void);
  */
 bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pinCsGd,uint8_t _pinCsGe,uint8_t _pinCsGf,uint8_t _pinCsGg,uint8_t _pinCsGdp,uint8_t _pinSe10,uint8_t _pinCsSe11,uint32_t _SysTickFrec); // Init display
 
+//TODO setter
+// getter
 
 
 #endif // _DISPLAY_H_
