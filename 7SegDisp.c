@@ -1,6 +1,7 @@
 #include "7SegDisp.h"
 #include <stdbool.h>
 #include<stdint.h>
+#include"SysTick.h"
 /* cseg register(?) */
 static uint8_t cseg[4];//pin values(HIGH O LOW) for each 7seg
 static uint8_t pinCsGa;
@@ -152,8 +153,10 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 	gpioMode(pinSe11, OUTPUT);
 	setMux(0);//inicializo en rimer display el mux
 
+	SysTick_Init(IrqAllInclusive);
+
 	for(int i=0;i<4;i++){//SACAR para pruebas nomas, seteo los display en 0 1 2 3
-		cseg[i]=display_set_cseg(i);
+		cseg[i]=display_set_cseg(8);
 
 	}
 	return true;
@@ -208,17 +211,17 @@ void IrqAllInclusive(void){
 	static uint8_t lastDigit=0;
 
 	if((CounterPrescalerPwm%=prescalerPwm)==0){ //divicion del clock para el PWM
-		if((currentPeriod<brightLevel)&&(!turnOnOnce)){
-			setPinsState(cseg[lastDigit]);
-			turnOnOnce=1;
+		if((currentPeriod<brightLevel)){
+			if(!turnOnOnce){
+				setPinsState(cseg[lastDigit]);
+				turnOnOnce=1;
+			}
+
 		}else if(!turnOffOnce){
 			setPinsState(0);
 			turnOffOnce=1;
 		}
-		if((currentPeriod%=BRIGHT_LEVEL)==0){
-			turnOnOnce=0;
-			turnOffOnce=0;
-		}
+
 
 		if((CounterPrescalerMux%=prescalerMultiplexor)==0){ // divicion del clock para el multiplexeo de los 7 segmentos
 			setMux(current7Seg);
@@ -233,6 +236,13 @@ void IrqAllInclusive(void){
 		}
 		CounterPrescalerMux++;
 		currentPeriod++;
+		if((currentPeriod%=BRIGHT_LEVEL)==0){
+					turnOnOnce=0;
+					turnOffOnce=0;
+				}
 	}
 	CounterPrescalerPwm++;
+}
+void setBright(uint8_t b){
+	brightLevel=b;
 }
