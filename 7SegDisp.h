@@ -31,6 +31,11 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 
 //TODO setter
 // getter
+
+/**
+ * @brief set 7seg bright
+ * @param bright level, between 0 to BRIGHT_LEVEL-1
+ */
 void setBright(uint8_t b);
 
 #endif // _DISPLAY_H_

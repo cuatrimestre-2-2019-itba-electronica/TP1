@@ -46,10 +46,14 @@ static uint8_t brightLevel=4;
 #define display_CSEGDP_Pos          7U
 #define display_CSEGDP_Msk 			(1UL << display_CSEGDP_Pos)
 
-#define FREC_MULTIPLEXOR	1000U //frecuencia con las que se cambia de digito
-#define FREC_BRIGHTNESS	5000U
-#define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
 
+#define FREC_MULTIPLEXOR	1000U //frecuencia con las que se cambia de digito
+#define FREC_BRIGHTNESS	5000U //frecuencia de las simulaion del PWM
+#define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
+#define DIGIT_AMOUNT 4//cantidad de digitos del display
+#define ALPHABET 10//cantidad de simbolos del alfabeto
+#define CLEAR_DISPLAY 0
+#define MAX_INT_4_DIGIT 9999
 /**
  * @brief turn an int into a 7seg pin state
  * @param num numbre to turn into a 7seg
@@ -92,6 +96,9 @@ uint8_t display_set_cseg(unsigned int num){
 	}
 }
 
+/**
+ * @brief turn on off each gpio
+ */
 void display_CSEG_show(int PIN_CSEG, int PIN_LEVEL){
 	if(PIN_LEVEL!=0){
 		gpioWrite(PIN_CSEG, HIGH);
@@ -115,6 +122,10 @@ void setPinsState(uint8_t cSeg){
 	display_CSEG_show(pinCsGdp, cSeg & display_CSEGDP_Msk);
 }
 
+/**
+ * @brief set up gpio of the mux
+ * @param disp, wich 7seg i want to turn on, between 0 to 3
+ */
 void setMux(uint8_t disp){
 	if(disp>3){
 		disp=3;
@@ -163,45 +174,9 @@ bool display_init(uint8_t _pinCsGa,uint8_t _pinCsGb,uint8_t _pinCsGc,uint8_t _pi
 }
 
 
-void IrqMultiplexor(void){
-	static uint32_t CounterPrescaler=0;
-	//setPinsState(cseg[current7Seg]);//prendo los pines correspondientes del 7 seg
-	if(((CounterPrescaler%prescalerMultiplexor)==0)){
-
-		setPinsState(cseg[current7Seg]);
-		setMux(current7Seg);
-		current7Seg++;//incremneto contador de 7 segmentos
-		current7Seg=current7Seg%4;
-
-	}
-	CounterPrescaler%=prescalerMultiplexor;
-	CounterPrescaler++;
-}
-/*
-void IrqBrightness(void){
-	static uint32_t CounterPrescaler=0;
-	static uint8_t levelCount=0;
-	static uint8_t wasSetOn=0;
-	static uint8_t wasSetOff=0;
-	CounterPrescaler++;
-	if((CounterPrescaler%=prescalerBright)==0){
-		if(levelCount<brightLevel && !wasSetOn){
-			setPinsState(cseg[current7Seg]);
-			wasSetOn=1;
-		}else if(!wasSetOff){
-			setPinsState(0);
-			wasSetOff=1;
-		}
-		levelCount++;
-		if((levelCount%=BRIGHT_LEVEL)== 0){
-			wasSetOn=0;
-			wasSetOff=0;
-		}
-	}
-
-
-}
-*/
+/**
+ * @brief turn on off each 7seg, and change multiplexor(print lcd and set bright)
+ */
 void IrqAllInclusive(void){
 	static uint32_t CounterPrescalerPwm=0;
 	static uint32_t CounterPrescalerMux=0;
@@ -243,6 +218,36 @@ void IrqAllInclusive(void){
 	}
 	CounterPrescalerPwm++;
 }
-void setBright(uint8_t b){
-	brightLevel=b;
+
+
+void setBright(uint8_t bright){
+	bright%=BRIGHT_LEVEL;// aseguro que el nivel de brillo no sea mallor al esperado
+	brightLevel=bright;
+}
+
+
+void setDigit(uint8_t pos,uint8_t digit){
+	pos%=DIGIT_AMOUNT;//overflow protection
+	digit%=ALPHABET;
+	cseg[pos]=display_set_cseg(digit);
+}
+
+void clearDisplay(){
+	for(int i=0;i<DIGIT_AMOUNT;i++){
+		cseg[i]=CLEAR_DISPLAY;
+	}
+}
+
+bool setInt2Dsplay(uint16_t num){
+	uint8_t currentNum=0;
+	if(num>MAX_INT_4_DIGIT){
+		return false;
+	}
+
+	for(int i=0;i<MAX_INT_4_DIGIT;i++){
+		currentNum=num/(10^(MAX_INT_4_DIGIT-1-i));
+		num-=currentNum;
+		setDigit(MAX_INT_4_DIGIT-1-i,currentNum);
+	}
+
 }
