@@ -6,12 +6,14 @@ int encoder_init(){
 	callback_CCW = NULL;
 	callback_SW = NULL;
 
-	if(gpioIRQ(PIN_ENCODER_A, 10, &encoder_action_CCW()));
+	gpioMode(PIN_ENCODER_A, INPUT_PULLUP);
+	gpioMode(PIN_ENCODER_B, INPUT);
+	gpioMode(PIN_ENCODER_C, INPUT_PULLUP);
+
+	if(gpioIRQ(PIN_ENCODER_A, 10, &encoder_action()));
 		return 0;
-	if(gpioIRQ(PIN_ENCODER_B, 10, &encoder_action_CW()));
-			return 0;
 	if(gpioIRQ(PIN_ENCODER_C, 10, &encoder_action_SW()));
-			return 0;
+		return 0;
 
 	return 1;
 }
@@ -36,14 +38,18 @@ void encoder_set_callback_SW(void (*userCallback_SW)(void)){
 	callback_SW = userCallback_SW;
 }
 
-void encoder_action_CW(){
-	counter += 1;
-	callback_CW();
-}
+void encoder_action(){
 
-void encoder_action_CWW(){
-	counter -=1;
-	callback_CWW();
+	// If B is HIGH -> CW
+	if(gpioRead(PIN_ENCODER_B)){
+		counter ++;
+		callback_CW();
+	}
+	// If not -> CCW
+	else{
+		counter --;
+		callback_CCW();
+	}
 }
 
 void encoder_action_SW(){

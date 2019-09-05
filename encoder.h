@@ -21,11 +21,7 @@ int encoder_get_counter(); // Return the counter
 
 void encoder_set_counter(int userCounter); // Set the counter
 
-void encoder_action_CW();	// Function executed when the encoder is turned CW
-
-void encoder_action_CCW();	// Function executed when the encoder is turned CCW
-
-void encoder_action_SW();	// Function executed when the encoder is pressed
+void encoder_action();	// Function executed when the encoder is turned
 
 void encoder_set_callback_CW(void (*userCallback_CW)(void));	// Set the function to do when the encoder is turned CW
 
