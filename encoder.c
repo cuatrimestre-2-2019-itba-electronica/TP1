@@ -2,17 +2,18 @@
 
 int encoder_init(){
 	counter = 0;
-	callback_CW = NULL;
-	callback_CCW = NULL;
-	callback_SW = NULL;
+	//callback_CW = NULL;
+	//callback_CCW = NULL;
+	//callback_SW = NULL;
 
-	gpioMode(PIN_ENCODER_A, INPUT_PULLUP);
+	gpioMode(PIN_ENCODER_A, INPUT);
 	gpioMode(PIN_ENCODER_B, INPUT);
-	gpioMode(PIN_ENCODER_C, INPUT_PULLUP);
+	gpioMode(PIN_ENCODER_C, INPUT);
+	
 
-	if(gpioIRQ(PIN_ENCODER_A, 10, &encoder_action()));
+	if(!gpioIRQ(PIN_ENCODER_A, GPIO_IRQ_MODE_RISING_EDGE, encoder_action))
 		return 0;
-	if(gpioIRQ(PIN_ENCODER_C, 10, &encoder_action_SW()));
+	if(!gpioIRQ(PIN_ENCODER_C, GPIO_IRQ_MODE_FALLING_EDGE, encoder_action_SW))
 		return 0;
 
 	return 1;
