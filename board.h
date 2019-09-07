@@ -31,6 +31,9 @@
 #define PIN_SE10 	PORTNUM2PIN(PB,23)
 #define PIN_SE11 	PORTNUM2PIN(PA,2)
 
+// 3LedDisp Pins
+#define PIN_3LED_SE10 	PORTNUM2PIN(PC,7)
+#define PIN_3LED_SE11 	PORTNUM2PIN(PC,0)
 // On Board User LEDs
 #define PIN_LED_RED	PORTNUM2PIN(PB,22)     // ???
 #define PIN_LED_GREEN	PORTNUM2PIN(PE,26)  // ???

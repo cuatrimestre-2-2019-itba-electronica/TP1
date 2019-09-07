@@ -16,10 +16,6 @@
 #define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
 #define ALPHABET 10//cantidad de simbolos del alfabeto
 
-//*************************IRQ****************************
-/**
- * @brief when its called change de 7seg chosen
- */
 
 /**
  * @brief set up  the pins for 7seg display, as output

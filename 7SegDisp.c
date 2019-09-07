@@ -145,7 +145,7 @@ bool _7SegDisp_display_init(void){
 	gpioMode(PIN_SE11, OUTPUT);
 	setMux(0);//inicializo en rimer display el mux
 
-	SysTick_Init(IrqAllInclusive);
+	SysTick_append(IrqAllInclusive);
 
 	for(int i=0;i<4;i++){//SACAR para pruebas nomas, seteo los display en 0 1 2 3
 		cseg[i]=display_set_cseg(8);
