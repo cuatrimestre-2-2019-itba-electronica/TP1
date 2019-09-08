@@ -2,10 +2,10 @@
 #include "7SegDisp.h"
 static uint8_t data[AMAUNT_DIGITS_8_DISPLAY+DIGIT_AMOUNT-1]; //arreglo de los numores del display emulado, la posicion 0 es el mas significativo. ej 340 -> 3|4|0|..
 uint8_t *_8digits;
-static uint8_t cursorPosition=0;//posicion del cursor - dot
+static int8_t cursorPosition=0;//posicion del cursor - dot
 static int8_t lastDigitPos=-1;//posicion del ultimo digito del display - otambien tamano del display menos uno
 static int8_t DispOffset=0;//ofeset para mover cambiar la ventana de lo que se ve en los 7seg- maximo ofset es 4
-
+static bool showCursor=false;//muestro o no el cursor en pantalla (true) - dot
 
 
 void _8DigitDisplay_reset(void){
@@ -16,6 +16,7 @@ void _8DigitDisplay_reset(void){
 	cursorPosition=0;
 	lastDigitPos=-1;
 	DispOffset=0;
+	showCursor=false;
 }
 
 void _8DigitDisplay_init(void){
@@ -26,14 +27,26 @@ void _8DigitDisplay_init(void){
 }
 
 static void refresh7SegDisp(void){
+	_7SegDisp_clearCursor();
+	if(DispOffset>AMAUNT_DIGITS_8_DISPLAY-1){
+		DispOffset=AMAUNT_DIGITS_8_DISPLAY-1;
+	}
+	for(int i=0;i<DIGIT_AMOUNT;i++){
+		_7SegDisp_setDigit(i,data[DIGIT_AMOUNT-1+DispOffset-i]);
+		if((DIGIT_AMOUNT-1+DispOffset-i)==(cursorPosition+DIGIT_AMOUNT-1)){
+			if(showCursor){
+				_7SegDisp_setCursor(i);
+				_7SegDisp_updateCursor();
+			}
 
-for(int i=0;i<DIGIT_AMOUNT;i++){
-	_7SegDisp_setDigit(i,data[DIGIT_AMOUNT-1+DispOffset-i]);
+		}
 
-}
+
+	}
 }
 
 static bool shiftLeftDisp(void){
+
 
 	if(DispOffset>AMAUNT_DIGITS_8_DISPLAY-1){
 		DispOffset=AMAUNT_DIGITS_8_DISPLAY-1;
@@ -44,7 +57,6 @@ static bool shiftLeftDisp(void){
 		refresh7SegDisp();
 		DispOffset++;
 		return true;
-
 	}
 
 }
@@ -69,10 +81,63 @@ void _8DigitDisplay_append(uint8_t num){
 	}
 
 	_8digits[lastDigitPos]=num;
+	cursorPosition=lastDigitPos;
 
 	shiftLeftDisp();
 
+}
 
+void _8DigitDisplay_cursorOn(void){
+	showCursor=true;
+	refresh7SegDisp();
+}
+
+void _8DigitDisplay_cursorOff(void){
+	showCursor=false;
+	refresh7SegDisp();
+}
+
+bool _8DigitDisplay_SetCursorPos(uint8_t pos){
+	if(pos>AMAUNT_DIGITS_8_DISPLAY-1){
+		return false;
+	}
+	cursorPosition=pos;
+	refresh7SegDisp();
+	return true;
 
 }
+
+uint8_t _8DigitDisplay_GetCursorPos(void){
+	return cursorPosition;
+}
+
+void _8DigitDisplay_SetCharInCursorPos(uint8_t num){
+	_8digits[cursorPosition]=num;
+	refresh7SegDisp();
+
+}
+
+void _8DigitDisplay_SetCursorPos2End(void){
+	cursorPosition=lastDigitPos;
+	refresh7SegDisp();
+}
+
+void _8DigitDisplay_SetCursorPosOnScrenn(void){
+		if(cursorPosition<DIGIT_AMOUNT){
+			DispOffset=DIGIT_AMOUNT-1;
+		}else{
+			DispOffset=AMAUNT_DIGITS_8_DISPLAY-1;
+		}
+		refresh7SegDisp();
+}
+void _8DigitDisplay_ShiftCursorLeft(void){
+	cursorPosition--;
+	if(cursorPosition<0){
+		cursorPosition=0;
+	}
+	_8DigitDisplay_SetCursorPosOnScrenn();
+
+}
+
+//	|	|	|	0|	|	|	3|	4|	|	|	7|
 

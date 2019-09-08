@@ -14,7 +14,8 @@
 
 #define DIGIT_AMOUNT 4//cantidad de digitos del display
 #define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
-#define ALPHABET 10//cantidad de simbolos del alfabeto
+#define ALPHABET 15//cantidad de simbolos del alfabeto
+#define _7DIGIT_BLANK 11
 
 
 /**
@@ -49,7 +50,7 @@ void _7SegDisp_clearDisplay(void);
 bool _7SegDisp_setCursor(uint8_t pos);
 
 /**
- * @brief turn of the dop of de lcd 7seg
+ * @brief turn off the dop of de lcd 7seg
  */
 void _7SegDisp_clearCursor(void);
 
