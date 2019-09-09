@@ -16,7 +16,7 @@
 #define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
 #define ALPHABET 15//cantidad de simbolos del alfabeto
 #define _7DIGIT_BLANK 11
-
+#define _7DIGIT_GUION 10
 
 /**
  * @brief set up  the pins for 7seg display, as output

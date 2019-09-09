@@ -24,7 +24,8 @@ void _8DigitDisplay_SetCharInCursorPos(uint8_t num);
 void _8DigitDisplay_SetCursorPos2End(void);
 void _8DigitDisplay_SetCursorPosOnScrenn(void);
 void _8DigitDisplay_ShiftCursorLeft(void);
-
+void _8DigitDisplay_PinMode(bool mode);
+void _8DigitDisplay_SetBright(uint8_t b);
 
 
 
@@ -36,8 +37,7 @@ void _8DigitDisplay_ShiftCursorLeft(void);
 //scroll(bool on);
 
 
-////cursor left si llego a los extremos me quedo ahi
-////cursor right
+
 ////mode pin(on/off)
 
 ////////////////////////////////////////////////

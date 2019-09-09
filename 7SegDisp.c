@@ -7,7 +7,7 @@
 static uint8_t cseg[4];//pin values(HIGH O LOW) for each 7seg
 static uint8_t current7Seg=0;//7 segmento que se esta senalando en el momento
 
-static uint8_t brightLevel=4;
+static uint8_t brightLevel=2;
 static uint8_t cursorPos=0;
 
 /* Masks */
@@ -85,6 +85,9 @@ uint8_t display_set_cseg(unsigned int num){
 			break;
 		case 9:
 			return(0x6F);
+			break;
+		case 10:
+			return(display_CSEGG_Msk);
 			break;
 		default:
 			return(0x00);
