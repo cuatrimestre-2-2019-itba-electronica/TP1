@@ -13,16 +13,54 @@
 //#include "waiting_id_suceso_queue.h"
 //#include "evento_queue.h"
 
-//#include "fsm.h"
+#include "fsm.h"
 
 #include "database.h"
 
 int main(void)
 {
-//    FSM * machine  = FSM__create();
-//    unsigned int i = 1;
-//    while(!FSM_cycle(machine) && i++);
-//    return 0;
+    setbuf(stdout, 0);
+
+
+    uint8_t ID[3] = {0,0,0};
+    uint8_t PIN[3] = {4,5,9};
+    database_append(database_get_hash(ID, 3), database_get_hash(PIN,3));
+    uint8_t ID1[3] = {4,2,3};
+    uint8_t PIN1[3] = {4,5,6};
+    database_append(database_get_hash(ID1, 3), database_get_hash(PIN1,3));
+    uint8_t ID2[3] = {1,2,3};
+    uint8_t PIN2[3] = {4,5,6};
+    database_append(database_get_hash(ID2, 3), database_get_hash(PIN2,3));
+//    printf("tamanio: %d\n", database_get_size());
+//
+//    database_append_value(NULL);
+//    printf("tamanio: %d\n", database_get_size());
+//
+//    DATABASE_ENTRY * entry;
+//
+//    entry = malloc(sizeof(DATABASE_ENTRY));
+//    entry->key = 1;
+//    database_append_value(entry);
+//    printf("tamanio: %d\n", database_get_size());
+//
+//    entry = malloc(sizeof(DATABASE_ENTRY));
+//    entry->key = 2;
+//    database_append_value(entry);
+//    printf("tamanio: %d\n", database_get_size());
+//
+//    entry = database_get_entry_at_cursor();
+//    printf("key: %d\n", entry->key);
+//    entry++;
+//    printf("key: %d\n", entry->key);
+//
+//    database_empty();
+//    free(entry);
+
+
+    FSM * machine  = FSM__create();
+    unsigned int i = 1;
+    while(!FSM_cycle(machine) && i++);
+    return 0;
 
 
 //    SUCESO_QUEUE * suQ = suceso_queue__create();

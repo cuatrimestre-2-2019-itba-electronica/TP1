@@ -16,6 +16,8 @@
 #include "config.h"
 #include "event_sources.h"
 
+#include "database.h"
+
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -133,8 +135,9 @@ static estado_t * est_editing_PIN_ev_fail_num_input(evento_t * ev);
  * *****************************/
 
 //ESTADO_WAITING_ID
-bool validate_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len);
-bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len);
+static bool validate_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len);
+static bool validate_PIN(uint8_t * PIN_buffer, uint8_t PIN_buffer_len);
+static bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos);
 
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
@@ -279,7 +282,7 @@ EVENTO_QUEUE * estado_create_evento_queue(estado_t *self) {
             num_buff_params.max_length = EST_WAITING_PIN_NUM_BUFF_MAX_LENGTH;
             num_buff_params.min_length = EST_WAITING_PIN_NUM_BUFF_MIN_LENGTH;
             num_buff_params.show_num_buff = show_ID;
-            num_buff_params.is_num_buff_correct = validate_ID;
+            num_buff_params.is_num_buff_correct = validate_PIN;
             evento_source = evento_source__create(EVENTO_SOURCE_GET_NUM_BUFF_TYPE, (void *)&num_buff_params );
             append_evento_source(q,evento_source);
             break;
@@ -287,7 +290,6 @@ EVENTO_QUEUE * estado_create_evento_queue(estado_t *self) {
             //todo: agregar queue de seleccionar de lista
             break;
         case EST_EDIT_PIN_TYPE:
-            //TODO: obtener esta info de la base de datos:
             num_buff_params.initial_num_buff_len = EST_WAITING_PIN_NUM_BUFF_MAX_LENGTH;
             num_buff_params.initial_num_buff = malloc(num_buff_params.initial_num_buff_len);
             if(num_buff_params.initial_num_buff == NULL){ break; }
@@ -366,13 +368,14 @@ static estado_t * est_xx_ev_timeout(evento_t * ev){
 
 //ESTADO_WAITING_ID
 static estado_t * est_waiting_ID_ev_cor_num_input(evento_t * ev) {
-    uint8_t * ID_buffer = malloc(ev->correct_num_input.num_buff_len);
-    if(ID_buffer != NULL){
-        for (int i = 0; i < ev->correct_num_input.num_buff_len; ++i) {
-            ID_buffer[i] = ev->correct_num_input.num_buff[i];
-        }
-    }
-    estado_waiting_PIN_data_t data = {ID_buffer, ev->correct_num_input.num_buff_len, 0};
+    hash_t hash = database_get_hash(ev->correct_num_input.num_buff, ev->correct_num_input.num_buff_len);
+    database_set_cursor_pos(database_get_pos_from_hash(true, hash));
+
+    //nadie hace free de la memoria del evento? le puedo pasar el puntero directo?
+    //rta: si!! evento_queue se desentendio de esa memoria una vez generado
+    estado_waiting_PIN_data_t data = {ev->correct_num_input.num_buff,
+                                      ev->correct_num_input.num_buff_len,
+                                      0};
     return estado__create(EST_WAITING_PIN_TYPE, &data);
 }
 
@@ -391,12 +394,11 @@ static estado_t * est_waiting_PIN_ev_fail_num_input(evento_t * ev){
 
 //ESTADO_GOT_ACCESS
 static estado_t * est_got_access_ev_edit_pin_input(evento_t * ev){
-    //todo: obtener length y contenido del PIN_buffer a partir del cursor de la database
-    uint8_t PIN_buffer_len = 5;
+    uint8_t PIN_buffer_len = PIN_MAX_LENGTH;
     uint8_t * PIN_buffer = malloc(PIN_buffer_len);
     if(PIN_buffer != NULL){
         for (int i = 0; i < PIN_buffer_len; ++i) {
-            PIN_buffer[i] = i;
+            PIN_buffer[i] = UINT8_MAX;
         }
     }
     estado_editing_PIN_data_t data = {PIN_buffer, PIN_buffer_len};
@@ -405,7 +407,10 @@ static estado_t * est_got_access_ev_edit_pin_input(evento_t * ev){
 
 //ESTADO_EDIT_PIN
 static estado_t * est_editing_PIN_ev_cor_num_input(evento_t * ev){
-    //todo: guardar el nuevo PIN en la database;
+    database_get_PIN_hash_at_cursor(database_get_hash( \
+            ev->correct_num_input.num_buff, \
+            ev->correct_num_input.num_buff_len) \
+            );
     return estado__create(EST_GOT_ACCESS_TYPE, NULL);
 }
 static estado_t * est_editing_PIN_ev_fail_num_input(evento_t * ev){
@@ -413,13 +418,27 @@ static estado_t * est_editing_PIN_ev_fail_num_input(evento_t * ev){
 }
 
 
-//todo: los callbacks de validacion de num_buff y etc.
-bool validate_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len){ return true; }
+bool validate_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len){
+    hash_t hash = database_get_hash(ID_buffer, ID_buffer_len);
+    int pos = database_get_pos_from_hash(true, hash);
+    return pos != -1;
+}
 
-bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len)
+bool validate_PIN(uint8_t * ID_buffer, uint8_t ID_buffer_len){
+    hash_t hash = database_get_hash(ID_buffer, ID_buffer_len);
+    return hash == database_get_PIN_hash_at_cursor();
+}
+
+bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos)
 {
     for (int i = 0; i < ID_buffer_len; ++i) {
         printf("%c", ID_buffer[i]+'0');
+    }
+    printf("\n");
+    for (int i = 0; i < ID_buffer_len; ++i) {
+        char c;
+        c = ((i == cursor_pos) ? 'X' : '_');
+        printf("%c", c);
     }
     printf("\n");
 }

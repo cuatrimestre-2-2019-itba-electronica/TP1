@@ -15,7 +15,7 @@
 
 //CONTROL
 #define TAPS_TO_CANCEL 3
-
+#define DELAYS_TO_TIMEOUT 3
 
 
 #endif //CONFIG_H

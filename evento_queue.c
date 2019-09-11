@@ -13,6 +13,22 @@
 #define EVENTO_SOURCES_COUNT_MAX 20
 #define EVENTO_QUEUE_SIZE 20
 
+#define EVENTO_VERBOSE
+
+#ifdef EVENTO_VERBOSE
+
+const char * ev_debug_codes[] = \
+{
+    "EVENTO_TIMEOUT_TYPE",
+    "EVENTO_CANCEL_TYPE",
+    "EVENTO_FAILED_NUM_INPUT_TYPE",
+    "EVENTO_CORRECT_NUM_INPUT_TYPE",
+    "EVENTO_EDIT_PIN",
+    "EVENTO_N"
+};
+#endif
+
+
 //Para el ring buffer
 UT_icd evento_icd = {sizeof(evento_t), NULL, NULL, NULL};
 
@@ -111,7 +127,6 @@ void evento_queue_update(EVENTO_QUEUE *self)
     if(!is_suceso_queue_empty(self->suceso_queue))
     {
         suceso_t suceso = get_next_suceso(self->suceso_queue);
-        printf("suceso: %d\n", (int)suceso);
         for(int i = 0; i < self->evento_sources_count; i++)
         {
             evento = get_evento(self->evento_sources[i], suceso);
@@ -161,7 +176,12 @@ evento_t get_next_event(EVENTO_QUEUE *self) {
         ev.type = EVENTO_N;
         return ev;
     }
+
     ev = evento_queue_pop_front(self);
+#ifdef EVENTO_VERBOSE
+    printf("**EVENTO: %s** \n", ev_debug_codes[ev.type]);
+#endif
+
     return ev;
 }
 

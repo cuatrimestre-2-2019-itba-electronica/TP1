@@ -3,12 +3,42 @@
 //
 
 #include "waiting_id_suceso_queue.h"
+
+#include <stdint.h>
+#include <stdio.h>
+
 #include "waiting_id_suceso_sources.h"
 #include "cqp_queue.h"
 #include "circular_buffer/utringbuffer.h"
-#include <stdint.h>
 
-// Source file
+
+
+#define SUCESOS_VERBOSE
+#ifdef SUCESOS_VERBOSE
+const char * suc_debug_codes[] = \
+    {   "SUC_NUM_0",
+        "SUC_NUM_1",
+        "SUC_NUM_2",
+        "SUC_NUM_3",
+        "SUC_NUM_4",
+        "SUC_NUM_5",
+        "SUC_NUM_6",
+        "SUC_NUM_7",
+        "SUC_NUM_8",
+        "SUC_NUM_9",
+        "SUC_TAP_DETECTED",
+        "SUC_MOVE_CURSOR_LEFT",
+        "SUC_MOVE_CURSOR_RIGHT",
+        "SUC_INC_DIS_INTENSITY",
+        "SUC_SCROLL_UP",
+        "SUC_SCROLL_DOWN",
+        "SUC_DELAY",
+        "SUC_SWIPE_INTERRUPTED",
+        "SUC_SWIPE_END",
+        "SUC_N"};
+
+#endif
+
 
 #define SUCESO_SOURCES_COUNT_MAX 20
 #define SUCESO_QUEUE_SIZE 20
@@ -45,6 +75,8 @@ void waiting_id_suceso_queue__init(SUCESO_QUEUE* self)
     SUCESO_SOURCE *  source = NULL;
 
     source = suceso_source__create(SUCESO_SOURCE_GET_NUM_TYPE);
+    append_suceso_source(self, source);
+    source = suceso_source__create(SUCESO_SOURCE_GET_DELAY_TYPE);
     append_suceso_source(self, source);
     source = suceso_source__create(SUCESO_SOURCE_GET_TAP_TYPE);
     append_suceso_source(self, source);
@@ -168,7 +200,12 @@ suceso_t get_next_suceso(SUCESO_QUEUE* self)
     {
         return SUC_N;
     }
+
     suceso_t suceso = suceso_queue_pop_front(self);
+
+#ifdef SUCESOS_VERBOSE
+    printf("*suceso: %s* \n", suc_debug_codes[suceso]);
+#endif
     return suceso;
 }
 
@@ -176,6 +213,5 @@ bool is_suceso_queue_empty(SUCESO_QUEUE * self){
     return !(self->suceso_queue_size);
 }
 
-//TODO: borrar suceso_queue_size
 
 

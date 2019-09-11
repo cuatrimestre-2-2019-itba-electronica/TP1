@@ -22,6 +22,9 @@ typedef enum {
     SUC_INC_DIS_INTENSITY,
     SUC_SCROLL_UP,
     SUC_SCROLL_DOWN,
+    SUC_DELAY,
+    SUC_SWIPE_INTERRUPTED,
+    SUC_SWIPE_END,
     SUC_N} suceso_t;
 
 /*

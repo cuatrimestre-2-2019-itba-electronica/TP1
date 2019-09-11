@@ -8,17 +8,11 @@
 #include <stdbool.h>
 #include <stdint-gcc.h>
 
-
-typedef struct DATABASE_ENTRY_VALUE{
-    uint8_t * ID_buffer;
-    uint8_t ID_buffer_len;
-    uint8_t * PIN_buffer;
-    uint8_t PIN_buffer_len;
-}DATABASE_ENTRY_VALUE;
+typedef unsigned int hash_t;
 
 typedef struct DATABASE_ENTRY {
-    uint8_t key;
-    DATABASE_ENTRY_VALUE value;
+    hash_t ID_hash;
+    hash_t PIN_hash;
 } DATABASE_ENTRY;
 
 //false si out of bounds
@@ -28,36 +22,49 @@ bool database_set_cursor_pos(unsigned int cursor_pos);
 //Si hay elementos, devuelve la posicion del cursor
 int database_get_cursor_pos();
 
-//Si esta vacio, devuelve NULL.
-//Si hay elementos, devuelve el elemento al cual apunta el cursor
-//No entrega ownership. Si se modifica el contenido, se modifica
-//en la base de datos tambien
-const DATABASE_ENTRY * database_get_entry_at_cursor();
+//Si esta vacio, devuelve 0.
+//Si hay elementos, devuelve el ID_hash del elemento al cual
+//apunta el cursor
+hash_t database_get_ID_hash_at_cursor();
 
-//Si esta vacio o si la posicion excede a la longitud, devuelve
-//NULL.
-//Si hay elementos, devuelve el elemento al cual apunta el cursor
-//No entrega ownership. Si se modifica el contenido, se modifica
-//en la base de datos tambien
-const DATABASE_ENTRY * database_get_entry_at(unsigned int pos);
+//Si esta vacio, devuelve 0.
+//Si hay elementos, devuelve el PIN_hash del elemento al cual
+//apunta el cursor
+ hash_t database_get_PIN_hash_at_cursor();
 
-//bool database_delete_entry_at_cursor();
+//Si esta vacio o si la posicion excede a la longitud, devuelve 0.
+//Si hay elementos, devuelve el ID_hash del elemento de la
+// posicion pos
+hash_t database_get_ID_hash_at(unsigned int pos);
 
-//bool database_delete_entry_at(unsigned int pos);
+//Si esta vacio o si la posicion excede a la longitud, devuelve 0.
+//Si hay elementos, devuelve el PIN_hash del elemento de la
+// posicion pos
+hash_t database_get_PIN_hash_at(unsigned int pos);
 
 //false si out of bounds
-//toma ownership de la memoria en entry
-bool database_set_entry_at_cursor(DATABASE_ENTRY * entry);
+bool database_set_ID_hash_at_cursor(hash_t PIN_hash);
 
 //false si out of bounds
-//toma ownership de la memoria en entry
-bool database_set_entry_at(DATABASE_ENTRY * entry, unsigned int pos);
+bool database_set_PIN_hash_at_cursor(hash_t PIN_hash);
+
+//false si out of bounds
+bool database_set_ID_hash_at(hash_t PIN_hash, unsigned int pos);
+
+//false si out of bounds
+bool database_set_PIN_hash_at(hash_t PIN_hash, unsigned int pos);
 
 //no modifica el cursor
-void database_append_entry(DATABASE_ENTRY * entry);
+void database_append(hash_t ID_hash, hash_t PIN_hash);
 
-unsigned int database_get_size(DATABASE_ENTRY * entry);
+unsigned int database_get_size();
 
 unsigned int database_empty();
+
+hash_t database_get_hash(uint8_t * buff, unsigned int len);
+
+//Devuelve la posicion en la que se hallo el hash especificado.
+//Si no se hallo, devuelve -1
+int database_get_pos_from_hash(bool ID, hash_t hash);
 
 #endif //DATABASE_H

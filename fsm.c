@@ -76,7 +76,7 @@ bool FSM_cycle(FSM * self)
         evento_t ev = get_next_event(self->evento_q);
         estado_t * next_state = estado_dispatch_evento(self->cur_state, ev);
         if(next_state != NULL) {
-            printf("NEW STATE: %d\n", estado_get_type(next_state));
+            printf("\n ***NEW STATE: %d***\n\n", estado_get_type(next_state));
             estado__destroy(self->cur_state);
             evento_queue__destroy(self->evento_q);
             self->cur_state = next_state;

@@ -35,6 +35,5 @@ void delete_suceso_source(SUCESO_QUEUE * self, SUCESO_SOURCE * source);
 
 
 
-//TODO: suceso_source deberia tener variables que se puedan resetear
 
 #endif //CODIGO_BORRADOR_
