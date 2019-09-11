@@ -1,6 +1,10 @@
 #include "encoder.h"
 #include "SysTick.h"
 
+#define FREC_POLLING 5000U //frecuencia del polling
+
+#define PRESCALER (SYSTICK_ISR_FREQUENCY_HZ/FREC_POLLING)
+
 static int aState;
 static int aLastState;
 
@@ -16,21 +20,27 @@ int encoder_init(){
 	callback_SW_PRESS = doNothing;
 	callback_SW_RELEASE = doNothing;
 
-	MYgpioMode(PIN_ENCODER_A, INPUT);
-	MYgpioMode(PIN_ENCODER_B, INPUT);
-	MYgpioMode(PIN_ENCODER_C, INPUT);
+	gpioMode(PIN_ENCODER_A, INPUT);
+	gpioMode(PIN_ENCODER_B, INPUT);
+	gpioMode(PIN_ENCODER_C, INPUT);
 
-	cLastState = MYgpioRead(PIN_ENCODER_C);
-	aLastState = MYgpioRead(PIN_ENCODER_A);
+	cLastState = gpioRead(PIN_ENCODER_C);
+	aLastState = gpioRead(PIN_ENCODER_A);
 
-	SysTick_Init(encoder_read);
+	SysTick_append(encoder_read);
 
 	return 1;
 }
 
 void encoder_read(){
-	encoder_read_POS();
-	encoder_read_SW();
+	static uint32_t counterPrescaler = 0;
+	
+	if((counterPrescaler %= PRESCALER) == 0){
+		encoder_read_POS();
+		encoder_read_SW();
+	}
+	
+	counterPrescaler++;
 }
 
 /*******************************************************************************
@@ -40,7 +50,7 @@ void encoder_read(){
 void encoder_action(){
 
 	// If B is HIGH -> CW
-	if(MYgpioRead(PIN_ENCODER_B) == HIGH){
+	if(gpioRead(PIN_ENCODER_B) == HIGH){
 		counter ++;
 		callback_CW();
 	}
@@ -52,7 +62,7 @@ void encoder_action(){
 }
 
 void encoder_read_POS(){
-	aState = MYgpioRead(PIN_ENCODER_A);
+	aState = gpioRead(PIN_ENCODER_A);
 
 	// If the state of A has changed
 	if (aState != aLastState && aState == HIGH){
@@ -67,7 +77,7 @@ void encoder_read_POS(){
  ******************************************************************************/
 
 void encoder_read_SW(){
-	cState = MYgpioRead(PIN_ENCODER_C);
+	cState = gpioRead(PIN_ENCODER_C);
 
 	if(cState == LOW){
 		if (cState != cLastState){
