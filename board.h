@@ -31,6 +31,8 @@
 #define PIN_SE10 	PORTNUM2PIN(PB,23)
 #define PIN_SE11 	PORTNUM2PIN(PA,2)
 
+#define PIN_MEAS	PORTNUM2PIN(PC,9)
+
 // 3LedDisp Pins
 #define PIN_3LED_SE10 	PORTNUM2PIN(PC,7)
 #define PIN_3LED_SE11 	PORTNUM2PIN(PC,0)
@@ -44,6 +46,11 @@
 #define PIN_SW2 PORTNUM2PIN(PC,6)      // ???
 #define PIN_SW3 PORTNUM2PIN(PA,4)     // ???
 
+//encoder
+
+#define PIN_ENCODER_A PORTNUM2PIN(PC,16)
+#define PIN_ENCODER_B PORTNUM2PIN(PC,17)
+#define PIN_ENCODER_C PORTNUM2PIN(PC,1)
 /*******************************************************************************
  ******************************************************************************/
 

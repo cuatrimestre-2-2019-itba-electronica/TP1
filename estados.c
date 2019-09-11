@@ -18,6 +18,10 @@
 
 #include "database.h"
 
+#include"8DigitsDisplay.h"
+
+
+
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -138,6 +142,7 @@ static estado_t * est_editing_PIN_ev_fail_num_input(evento_t * ev);
 static bool validate_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len);
 static bool validate_PIN(uint8_t * PIN_buffer, uint8_t PIN_buffer_len);
 static bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos);
+static bool show_PIN(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos);
 
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
@@ -281,7 +286,7 @@ EVENTO_QUEUE * estado_create_evento_queue(estado_t *self) {
             num_buff_params.initial_num_buff_len = 0;
             num_buff_params.max_length = EST_WAITING_PIN_NUM_BUFF_MAX_LENGTH;
             num_buff_params.min_length = EST_WAITING_PIN_NUM_BUFF_MIN_LENGTH;
-            num_buff_params.show_num_buff = show_ID;
+            num_buff_params.show_num_buff = show_PIN;
             num_buff_params.is_num_buff_correct = validate_PIN;
             evento_source = evento_source__create(EVENTO_SOURCE_GET_NUM_BUFF_TYPE, (void *)&num_buff_params );
             append_evento_source(q,evento_source);
@@ -385,7 +390,7 @@ static estado_t * est_waiting_ID_ev_fail_num_input(evento_t * ev) {
 
 //ESTADO_WAITING_PIN
 static estado_t * est_waiting_PIN_ev_cor_num_input(evento_t * ev){
-    return estado__create(EST_GOT_ACCESS_TYPE, NULL);
+	return estado__create(EST_GOT_ACCESS_TYPE, NULL);
 }
 
 static estado_t * est_waiting_PIN_ev_fail_num_input(evento_t * ev){
@@ -431,16 +436,35 @@ bool validate_PIN(uint8_t * ID_buffer, uint8_t ID_buffer_len){
 
 bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos)
 {
-    for (int i = 0; i < ID_buffer_len; ++i) {
-        printf("%c", ID_buffer[i]+'0');
+
+	_8DigitDisplay_reset();
+    _8DigitDisplay_cursorOn();
+	for (int i = 0; i < ID_buffer_len; ++i) {
+        _8DigitDisplay_append(ID_buffer[i]);
     }
-    printf("\n");
-    for (int i = 0; i < ID_buffer_len; ++i) {
-        char c;
-        c = ((i == cursor_pos) ? 'X' : '_');
-        printf("%c", c);
-    }
-    printf("\n");
+    _8DigitDisplay_SetCursorPos(cursor_pos);
+    _8DigitDisplay_SetCursorPosOnScrenn();
+//    _8DigitDisplay_SetCursorPos(cursor_pos);
+//    _8DigitDisplay_SetCursorPosOnScrenn();
 }
+
+
+static bool show_PIN(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos)
+{
+
+	_8DigitDisplay_reset();
+	_8DigitDisplay_PinMode(true);
+    _8DigitDisplay_cursorOn();
+	for (int i = 0; i < ID_buffer_len; ++i) {
+        _8DigitDisplay_append(ID_buffer[i]);
+    }
+    _8DigitDisplay_SetCursorPos(cursor_pos);
+    _8DigitDisplay_SetCursorPosOnScrenn();
+//    _8DigitDisplay_SetCursorPos(cursor_pos);
+//    _8DigitDisplay_SetCursorPosOnScrenn();
+}
+
+
+
 
 /******************************************************************************/

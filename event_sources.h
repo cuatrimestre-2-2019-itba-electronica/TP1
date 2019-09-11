@@ -20,7 +20,7 @@ typedef enum {
 
 //TODO: me falta un event_source o algo que sirva para seleccionar dentro de una lista
 
-// Tipo obscure para encapsulamiento (gracias Allegro por la inspo)
+// Tipo incomplete para encapsulamiento (gracias Allegro por la inspo)
 union EVENTO_SOURCE;
 typedef union EVENTO_SOURCE EVENTO_SOURCE;
 

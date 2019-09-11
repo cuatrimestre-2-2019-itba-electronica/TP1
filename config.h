@@ -7,9 +7,9 @@
 
 //FORMATO INPUT
 #define ID_MAX_LENGTH 3
-#define ID_MIN_LENGTH 2
+#define ID_MIN_LENGTH 3
 #define PIN_MAX_LENGTH 3
-#define PIN_MIN_LENGTH 2
+#define PIN_MIN_LENGTH 3
 
 #define TRIES_TO_LOCKOUT 3
 

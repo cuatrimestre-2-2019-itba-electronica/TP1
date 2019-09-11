@@ -23,4 +23,5 @@ evento_t create_evento(evento_type_t type) {
             ev.type = EVENTO_N;
             break;
     }
+    return ev;
 }

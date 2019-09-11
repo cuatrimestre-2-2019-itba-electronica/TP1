@@ -23,6 +23,12 @@ typedef void (*SysTick_funcallback)(void);
  * @return Initialization and registration succeed
  */
 bool SysTick_Init (void);
+
+/**
+ * @brief append function to be called at e frecuency of SYSTICK_ISR_FREQUENCY_HZ
+ * @return true if the callback was registred
+ * @param callback
+ */
 bool SysTick_append(SysTick_funcallback func);
 
 /*******************************************************************************

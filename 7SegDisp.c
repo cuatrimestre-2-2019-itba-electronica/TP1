@@ -37,7 +37,7 @@ static uint8_t cursorPos=0;
 #define display_CSEGDP_Msk 			(1UL << display_CSEGDP_Pos)
 
 
-#define FREC_MULTIPLEXOR	1000U //frecuencia con las que se cambia de digito
+#define FREC_MULTIPLEXOR	200U //frecuencia con las que se cambia de digito
 #define FREC_BRIGHTNESS	5000U //frecuencia de las simulaion del PWM
 
 
@@ -146,6 +146,9 @@ bool _7SegDisp_display_init(void){
 	gpioMode(PIN_CSEGDP, OUTPUT);
 	gpioMode(PIN_SE10, OUTPUT);
 	gpioMode(PIN_SE11, OUTPUT);
+
+	//gpioMode(PIN_MEAS, OUTPUT);//todo sacar
+
 	setMux(0);//inicializo en rimer display el mux
 
 	SysTick_append(IrqAllInclusive);
@@ -163,6 +166,7 @@ bool _7SegDisp_display_init(void){
  * @brief turn on off each 7seg, and change multiplexor(print lcd and set bright)
  */
 static void IrqAllInclusive(void){
+	//gpioWrite(PIN_MEAS,true);//todo sacar
 	static uint32_t CounterPrescalerPwm=0;
 	static uint32_t CounterPrescalerMux=0;
 	static uint32_t currentPeriod=0;
@@ -184,6 +188,7 @@ static void IrqAllInclusive(void){
 
 
 		if((CounterPrescalerMux%=PRESCALER_MULTIPLEXOR)==0){ // divicion del clock para el multiplexeo de los 7 segmentos
+
 			setMux(current7Seg);
 			if(!turnOffOnce){
 				setPinsState(cseg[current7Seg]);
@@ -202,6 +207,7 @@ static void IrqAllInclusive(void){
 				}
 	}
 	CounterPrescalerPwm++;
+	//gpioWrite(PIN_MEAS,false);//todo sacar
 }
 
 

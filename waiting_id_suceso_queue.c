@@ -13,7 +13,7 @@
 
 
 
-#define SUCESOS_VERBOSE
+//#define SUCESOS_VERBOSE
 #ifdef SUCESOS_VERBOSE
 const char * suc_debug_codes[] = \
     {   "SUC_NUM_0",
