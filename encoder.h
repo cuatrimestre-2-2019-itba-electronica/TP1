@@ -7,7 +7,7 @@
 #ifndef _ENCODER_H_
 #define _ENCODER_H_
 
-#include "mygpio.h"
+#include "gpio.h"
 #include "board.h"
 
 static int counter;
