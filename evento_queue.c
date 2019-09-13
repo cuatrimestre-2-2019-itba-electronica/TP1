@@ -53,6 +53,7 @@ void evento_queue__init(EVENTO_QUEUE * self)
     }
 
     //creacion del buffer circular de sucesos (para la salida)
+    evento_icd.sz = sizeof(evento_t);
     utringbuffer_new(self->evento_queue, EVENTO_QUEUE_SIZE, &evento_icd);
     self->last_evento = utringbuffer_front(self->evento_queue);
 

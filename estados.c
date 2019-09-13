@@ -380,6 +380,7 @@ static void estado__reset(estado_t * self){
 
 //PARA LOS ESTADOS QUE TENGAN TIMEOUT:
 static estado_t * est_xx_ev_timeout(evento_t * ev){
+    _8DigitDisplay_reset();
     return estado__create(EST_WAITING_ID_TYPE, NULL);
 }
 
@@ -398,11 +399,13 @@ static estado_t * est_waiting_ID_ev_cor_num_input(evento_t * ev) {
 }
 
 static estado_t * est_waiting_ID_ev_fail_num_input(evento_t * ev) {
+    _8DigitDisplay_reset();
     return estado__create(EST_WAITING_ID_TYPE, NULL);
 }
 
 //ESTADO_WAITING_PIN
 static estado_t * est_waiting_PIN_ev_cor_num_input(evento_t * ev){
+    _8DigitDisplay_reset();
 	_3LedDisp_setLed(0, true);
 	_7SegDisp_clearDisplay();
 	return estado__create(EST_GOT_ACCESS_TYPE, NULL);
@@ -414,7 +417,8 @@ static estado_t * est_waiting_PIN_ev_fail_num_input(evento_t * ev){
 
 //ESTADO_GOT_ACCESS
 static estado_t * est_got_access_ev_edit_pin_input(evento_t * ev){
-    uint8_t PIN_buffer_len = PIN_MAX_LENGTH;
+    _8DigitDisplay_reset();
+	uint8_t PIN_buffer_len = PIN_MAX_LENGTH;
     uint8_t * PIN_buffer = malloc(PIN_buffer_len);
     if(PIN_buffer != NULL){
         for (int i = 0; i < PIN_buffer_len; ++i) {

@@ -69,6 +69,7 @@ void cqp_queue__init(CQP_QUEUE * self)
 
 	//Para el ring buffer
 	//creacion del buffer circular de sucesos (para la salida)
+	cqp_icd.sz = sizeof(cqp_t);
 	utringbuffer_new(self->CQP_queue, CQP_QUEUE_SIZE, &cqp_icd);
 	self->last_cqp = utringbuffer_front(self->CQP_queue);
 	self->cqp_queue_size = 0;
