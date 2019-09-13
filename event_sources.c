@@ -43,8 +43,10 @@ typedef struct EVENTO_SOURCE_GET_NUM_BUFF_DATA
     bool changing_num;  //true si se esta cambiando el valor de un digito y todavia no se confirmo con un tap
     bool swiping;  		//true si se esta cambiando el valor de un digito y todavia no se confirmo con un tap
 
+    bool card_enabled;
+
     uint8_t max_length;
-    uint8_t min_length; //todo: dejar de ignorar min_length
+    uint8_t min_length;
     uint8_t cur_length; //longitud actual del arreglo
 
     get_num_buff_validate_cb is_num_buff_correct;
@@ -68,6 +70,7 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
         case SUC_NUM_3: case SUC_NUM_4: case SUC_NUM_5:
         case SUC_NUM_6: case SUC_NUM_7: case SUC_NUM_8:
         case SUC_NUM_9:
+        	if(!data->card_enabled) { break; }
         	if( !data->swiping){
         		data->swiping = true;
         		data->changing_num = false;
@@ -90,6 +93,7 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
             // de 0 a espacio o de ID_MAX_NUM a espacio), indico que el ID ahora
             // es mas corto
         case SUC_SWIPE_END:
+        	if(!data->card_enabled) { break; }
         	user_is_done = true;
         	break;
         case SUC_SCROLL_UP:
@@ -318,7 +322,8 @@ static void evento_source__init(EVENTO_SOURCE* self, EVENTO_SOURCE_TYPE type, vo
 
             EVENTO_SOURCE_GET_NUM_BUFF_PARAMS * params = (EVENTO_SOURCE_GET_NUM_BUFF_PARAMS *)_params;
             self->get_id.data.cursor = 0;
-            self->get_id.data.changing_num = false;
+            self->get_id.data.changing_num = true;
+        	self->get_id.data.card_enabled = params->card_enabled;
             self->get_id.data.max_length = params->max_length;
             self->get_id.data.min_length = params->min_length;
             self->get_id.data.is_num_buff_correct = params->is_num_buff_correct;

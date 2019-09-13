@@ -74,7 +74,6 @@ void mag_data (void){
 				for(int i = 0; i < WORD_LENGTH-1; i++){
 					if (!(LCR_control[i]%2)){
 						error = true;
-#warning fijarse que con una tarjeta no anda, metiste un magic number en el LCR_control
 						reset_mag();
 					}
 				}

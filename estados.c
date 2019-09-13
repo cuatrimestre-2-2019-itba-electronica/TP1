@@ -273,6 +273,10 @@ EVENTO_QUEUE * estado_create_evento_queue(estado_t *self) {
     switch (self->type)
     {
         case EST_WAITING_ID_TYPE:
+        	_3LedDisp_setLed(0, true);
+        	_3LedDisp_setLed(1, false);
+        	_3LedDisp_setLed(2, false);
+        	num_buff_params.card_enabled = true;
             num_buff_params.initial_num_buff = NULL;
             num_buff_params.initial_num_buff_len = 0;
             num_buff_params.max_length = EST_WAITING_ID_NUM_BUFF_MAX_LENGTH;
@@ -283,6 +287,10 @@ EVENTO_QUEUE * estado_create_evento_queue(estado_t *self) {
             append_evento_source(q,evento_source);
             break;
         case EST_WAITING_PIN_TYPE:
+        	_3LedDisp_setLed(0, false);
+        	_3LedDisp_setLed(1, true);
+        	_3LedDisp_setLed(2, false);
+        	num_buff_params.card_enabled = false;
             num_buff_params.initial_num_buff = NULL;
             num_buff_params.initial_num_buff_len = 0;
             num_buff_params.max_length = EST_WAITING_PIN_NUM_BUFF_MAX_LENGTH;
@@ -293,8 +301,10 @@ EVENTO_QUEUE * estado_create_evento_queue(estado_t *self) {
             append_evento_source(q,evento_source);
             break;
         case EST_GOT_ACCESS_TYPE:
-            //todo: agregar queue de seleccionar de lista
-            break;
+        	_3LedDisp_setLed(0, false);
+        	_3LedDisp_setLed(1, false);
+        	_3LedDisp_setLed(2, true);
+        	break;
         case EST_EDIT_PIN_TYPE:
             num_buff_params.initial_num_buff_len = EST_WAITING_PIN_NUM_BUFF_MAX_LENGTH;
             num_buff_params.initial_num_buff = malloc(num_buff_params.initial_num_buff_len);
@@ -443,7 +453,7 @@ bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos)
 	_8DigitDisplay_reset();
     _8DigitDisplay_cursorOn();
 	for (int i = 0; i < ID_buffer_len; ++i) {
-        _8DigitDisplay_append(ID_buffer[i]);
+        _8DigitDisplay_append(ID_buffer[i] == UINT8_MAX ? _8DIGIT_BLANK :ID_buffer[i]);
     }
     _8DigitDisplay_SetCursorPos(cursor_pos);
     _8DigitDisplay_SetCursorPosOnScrenn();
@@ -459,7 +469,7 @@ static bool show_PIN(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_
 	_8DigitDisplay_PinMode(true);
     _8DigitDisplay_cursorOn();
 	for (int i = 0; i < ID_buffer_len; ++i) {
-        _8DigitDisplay_append(ID_buffer[i]);
+        _8DigitDisplay_append(ID_buffer[i] == UINT8_MAX ? _8DIGIT_BLANK :ID_buffer[i]);
     }
     _8DigitDisplay_SetCursorPos(cursor_pos);
     _8DigitDisplay_SetCursorPosOnScrenn();

@@ -32,19 +32,28 @@ typedef struct SUCESO_SOURCE_GET_DELAY_DATA
     //Cuenta cuantas PASA_DELAY llegan ininterrumpidas por otras CQP
     unsigned int max_count;
     unsigned int count;
+    bool pressed;
 } SUCESO_SOURCE_GET_DELAY_DATA;
 
 suceso_t get_delay_fun(SUCESO_SOURCE_GET_DELAY_DATA * data, cqp_t cqp)
 {
-    if(cqp == PASA_DELAY)
+    if(!data->pressed)
     {
-        data->count++;
-        if(data->count == data->max_count){
-        	data->count = 1;
-            return SUC_DELAY;
-        }
+    	if(cqp == PASA_DELAY){
+			data->count++;
+			if(data->count == data->max_count){
+				data->count = 1;
+				return SUC_DELAY;
+			}
+    	} else if(cqp == PASA_PRESS) {
+    		data->pressed = true;
+        	data->count = 0;
+    	}
     } else {
     	data->count = 0;
+    	if(cqp == PASA_RELEASE){
+    		data->pressed = false;
+    	}
     }
 
     return SUC_N;
@@ -118,7 +127,7 @@ typedef struct SUCESO_SOURCE_GET_TAP_DATA
 
 suceso_t get_tap_fun(SUCESO_SOURCE_GET_TAP_DATA * data, cqp_t cqp)
 {
-	if(cqp == PASA_DELAY){
+/*	if(cqp == PASA_DELAY){
 		if(++(data->delay_count) < 2){
 			return SUC_N;
 		} else {
@@ -126,7 +135,7 @@ suceso_t get_tap_fun(SUCESO_SOURCE_GET_TAP_DATA * data, cqp_t cqp)
 		}
 	} else {
 		data->delay_count = 0;
-	}
+	}*/
 
 
     if(cqp == PASA_PRESS)
@@ -253,7 +262,7 @@ typedef struct SUCESO_SOURCE_GET_INC_DISP_INT_DATA
 
 suceso_t get_inc_disp_int_fun(SUCESO_SOURCE_GET_INC_DISP_INT_DATA * data, cqp_t cqp)
 {
-	if(cqp == PASA_DELAY){
+/*	if(cqp == PASA_DELAY){
 		if(++(data->delay_count) < 2){
 			return SUC_N;
 		} else {
@@ -262,7 +271,7 @@ suceso_t get_inc_disp_int_fun(SUCESO_SOURCE_GET_INC_DISP_INT_DATA * data, cqp_t 
 	} else {
 		data->delay_count = 0;
 	}
-
+*/
 
     // Si no esta apretado, lo unico relevante
     // que puede pasar es que se aprete.
@@ -284,7 +293,7 @@ suceso_t get_inc_disp_int_fun(SUCESO_SOURCE_GET_INC_DISP_INT_DATA * data, cqp_t 
     {
         case PASA_DELAY:
         	_8DigitDisplay_IncBright();
-            return SUC_DELAY;
+            return SUC_N;
         case PASA_RELEASE: default:
             data->pressed = false;
             return SUC_N;

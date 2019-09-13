@@ -6,10 +6,10 @@
 #define CONFIG_H
 
 //FORMATO INPUT
-#define ID_MAX_LENGTH 9
-#define ID_MIN_LENGTH 9
-#define PIN_MAX_LENGTH 3
-#define PIN_MIN_LENGTH 2
+#define ID_MAX_LENGTH 8
+#define ID_MIN_LENGTH 8
+#define PIN_MAX_LENGTH 5
+#define PIN_MIN_LENGTH 4
 
 #define TRIES_TO_LOCKOUT 3
 

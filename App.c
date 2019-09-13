@@ -53,7 +53,7 @@ static void delayLoop(uint32_t veces);
 /* Función que se llama 1 vez, al comienzo del programa */
 void App_Init (void)
 {
-	SysTick_Init();
+	timerInit();
 	//_7SegDisp_display_init();
 	_8DigitDisplay_init();
 	_3LedDisp_dispInit();
@@ -138,20 +138,15 @@ void App_Run (void)
 
 
 
-
-
-
-
-
 	uint8_t ID[3] = {0,0,0};
 	uint8_t PIN[3] = {4,5,9};
 	database_append(database_get_hash(ID, 3), database_get_hash(PIN,3));
-	uint8_t ID1[8] = {4,5,1,7,6,6,0,1};
-	uint8_t PIN1[3] = {4,5,6};
-	database_append(database_get_hash(ID1, 8), database_get_hash(PIN1,3));
+	uint8_t ID1[8] = {3,7,6,6,3,6,4,5};
+	uint8_t PIN1[3] = {3,2};
+	database_append(database_get_hash(ID1, 8), database_get_hash(PIN1,2));
 	uint8_t ID2[3] = {2,2,3};
-	uint8_t PIN2[3] = {3,3,1};
-	database_append(database_get_hash(ID2, 3), database_get_hash(PIN2,3));
+	uint8_t PIN2[2] = {3,2};
+	database_append(database_get_hash(ID2, 3), database_get_hash(PIN2,2));
 	FSM * machine  = FSM__create();
 	while(!FSM_cycle(machine));
 

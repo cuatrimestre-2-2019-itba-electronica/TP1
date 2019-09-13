@@ -40,6 +40,8 @@ typedef struct EVENTO_SOURCE_GET_NUM_BUFF_PARAMS{
     get_num_buff_validate_cb is_num_buff_correct;    //funcion que valida que el arreglo de numeros ingresado sea correcto.
     get_num_buff_show_cb show_num_buff;          //funcion que muestra al usuario el estado del buffer
 
+    bool card_enabled;						//true si quiero leer de la tarjeta
+
     uint8_t * initial_num_buff;             //buffer con el arreglo inicial predefinido. Si es NULL, se ignora y el arreglo inicia vacio
     uint8_t initial_num_buff_len;           //tamanio del buffer del arreglo inicial predefinido. Si es 0, se ignora y el arreglo inicia vacio
 }EVENTO_SOURCE_GET_NUM_BUFF_PARAMS;
