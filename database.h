@@ -67,4 +67,6 @@ hash_t database_get_hash(uint8_t * buff, unsigned int len);
 //Si no se hallo, devuelve -1
 int database_get_pos_from_hash(bool ID, hash_t hash);
 
+void database_populate();
+
 #endif //DATABASE_H
