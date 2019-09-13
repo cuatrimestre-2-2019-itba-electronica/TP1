@@ -65,105 +65,22 @@ void App_Init (void)
 
 void App_Run (void)
 {
-//	for(int i=0;i<10;i++){
-//
-//		for(int j=0;j<4;j++){
-//			_7SegDisp_setDigit(j,i);
-//		}
-//
-//		//7SegDisp_setBright(i);
-//		delayLoop(13947000);
-//	}
-//	delayLoop(13947000);
-//	for(int i=0;i<4;i++){
-//		_7SegDisp_setBright(i);
-//		_7SegDisp_setCursor(i);
-//		_7SegDisp_updateCursor();
-//		delayLoop(13947000);
-//	}
-//	_7SegDisp_clearCursor();
-//	delayLoop(13947000);
-//
-//	for(int i=0;i<3;i++){
-//		_3LedDisp_setLed(i,true);
-//		delayLoop(13947000);
-//	}
-//	for(int i=0;i<3;i++){
-//			_3LedDisp_setLed(i,false);
-//			delayLoop(13947000);
-////		}
-//	_8DigitDisplay_PinMode(true);
-//	_8DigitDisplay_cursorOn();
-//	_8DigitDisplay_SetCursorPos(4);
-
-//	for(int i=0;i<8;i++){
-//		_8DigitDisplay_cursorOn();
-//		_8DigitDisplay_append(i);
-//
-//		delayLoop(13947000);
-//
-//	}
-//	_8DigitDisplay_reset();
-
-
-//	delayLoop(13947000);
-//	_8DigitDisplay_cursorOff();
-//	delayLoop(13947000);
-//	_8DigitDisplay_cursorOn();
-//	delayLoop(13947000);
-//	//_8DigitDisplay_cursorOff();
-//	_8DigitDisplay_SetCursorPos(1);
-//	delayLoop(13947000);
-//	_8DigitDisplay_SetCharInCursorPos(8);
-//	delayLoop(13947000);
-//	_8DigitDisplay_SetCursorPosOnScrenn();
-////	delayLoop(13947000);
-//	_8DigitDisplay_SetCursorPos2End();
-//	_8DigitDisplay_SetCursorPosOnScrenn();
-//	delayLoop(13947000);
-//	for(int i=0;i<4;i++){
-//		_8DigitDisplay_SetBright(i);
-//		delayLoop(13947000);
-//
-//	}
-//
-//	for(int i=0;i<10;i++){
-//	 _8DigitDisplay_ShiftCursorLeft();
-//	 _8DigitDisplay_SetCursorPosOnScrenn();
-//	 delayLoop(13947000/2);
-//	}
-//	_8DigitDisplay_PinMode(false);
-//	delayLoop(13947000);
-//	_8DigitDisplay_reset();
 
 
 
-	uint8_t ID[3] = {0,0,0};
-	uint8_t PIN[3] = {4,5,9};
-	database_append(database_get_hash(ID, 3), database_get_hash(PIN,3));
-	uint8_t ID1[8] = {3,7,6,6,3,6,4,5};
-	uint8_t PIN1[3] = {3,2};
-	database_append(database_get_hash(ID1, 8), database_get_hash(PIN1,2));
-	uint8_t ID2[3] = {2,2,3};
-	uint8_t PIN2[2] = {3,2};
-	database_append(database_get_hash(ID2, 3), database_get_hash(PIN2,2));
+	uint8_t ID[] = {4,5,1,7,6,6,0,1};
+	uint8_t PIN[] = {4,5,9};
+	database_append(database_get_hash(ID, 8), database_get_hash(PIN,3));
+	uint8_t ID1[] = {3,7,6,6,3,6,4,5};
+	uint8_t PIN1[] = {3,2,3,2};
+	database_append(database_get_hash(ID1, 8), database_get_hash(PIN1,4));
+	uint8_t ID2[] = {0,1,2,3,4,5,6,7};
+	uint8_t PIN2[] = {5,5,5,5,5};
+	database_append(database_get_hash(ID2, 8), database_get_hash(PIN2,5));
 	FSM * machine  = FSM__create();
 	while(!FSM_cycle(machine));
 
 
-}
-
-
-/*******************************************************************************
- *******************************************************************************
-                        LOCAL FUNCTION DEFINITIONS
- *******************************************************************************
- ******************************************************************************/
-
-static void delayLoop(uint32_t veces)
-{
-
-	while (veces--);
 }
 
 

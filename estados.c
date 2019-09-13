@@ -237,7 +237,8 @@ estado_t * estado_dispatch_evento(estado_t *self, evento_t evento) {
         case EST_EDIT_PIN_TYPE:
             entry = state_transition_array_editing_PIN;
             break;
-        case EVENTO_N: default:
+        case EVENTO_N:
+        	default:
             entry = state_transition_array_empty;
             break;
     }

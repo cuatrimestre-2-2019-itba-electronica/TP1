@@ -107,7 +107,7 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
         case SUC_SCROLL_DOWN:
             if( scroll_down_ID_num(&(data->num_buff[data->cursor]))
                 && (data->cursor + 1 == data->cur_length)){
-                data->cur_length--; //todo: esta mal hacer esto sin tap
+                data->cur_length--;
             }
             data->changing_num = true;
             if(data->cursor >= data->cur_length) { data->cur_length = data->cursor + 1; }

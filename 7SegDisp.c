@@ -55,44 +55,50 @@ static void IrqAllInclusive(void);
  * @param num numbre to turn into a 7seg
  */
 uint8_t display_set_cseg(unsigned int num){
-	switch(num){
-		case 0:
-			return(0x3F);
-			break;
-		case 1:
-			return(0x06);
-			break;
-		case 2:
-			return(0x5B);
-			break;
-		case 3:
-			return(0x4F);
-			break;
-		case 4:
-			return(0x66);
-			break;
-		case 5:
-			return(0x6D);
-			break;
-		case 6:
-			return(0x7D);
-			break;
-		case 7:
-			return(0x07);
-			break;
-		case 8:
-			return(0x7F);
-			break;
-		case 9:
-			return(0x6F);
-			break;
-		case 10:
-			return(display_CSEGG_Msk);
-			break;
-		default:
-			return(0x00);
-			break;
+	uint8_t alfabeto[ALPHABET]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,display_CSEGG_Msk,0};
+	if(num<ALPHABET){
+		return alfabeto[num];
 	}
+	return 0;
+
+//	switch(num){
+//		case 0:
+//			return(0x3F);
+//			break;
+//		case 1:
+//			return(0x06);
+//			break;
+//		case 2:
+//			return(0x5B);
+//			break;
+//		case 3:
+//			return(0x4F);
+//			break;
+//		case 4:
+//			return(0x66);
+//			break;
+//		case 5:
+//			return(0x6D);
+//			break;
+//		case 6:
+//			return(0x7D);
+//			break;
+//		case 7:
+//			return(0x07);
+//			break;
+//		case 8:
+//			return(0x7F);
+//			break;
+//		case 9:
+//			return(0x6F);
+//			break;
+//		case 10:
+//			return(display_CSEGG_Msk);
+//			break;
+//		default:
+//			return(0x00);
+//			break;
+//	}
 }
 
 /**

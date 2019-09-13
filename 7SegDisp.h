@@ -14,7 +14,7 @@
 
 #define DIGIT_AMOUNT 4//cantidad de digitos del display
 #define BRIGHT_LEVEL 4 // cantidad de niveles de brillo
-#define ALPHABET 15//cantidad de simbolos del alfabeto
+#define ALPHABET 12//cantidad de simbolos del alfabeto
 #define _7DIGIT_BLANK 11
 #define _7DIGIT_GUION 10
 

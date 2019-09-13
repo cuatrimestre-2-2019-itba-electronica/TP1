@@ -31,7 +31,6 @@
 #define PIN_SE10 	PORTNUM2PIN(PB,23)
 #define PIN_SE11 	PORTNUM2PIN(PA,2)
 
-#define PIN_MEAS	PORTNUM2PIN(PC,9)
 
 // 3LedDisp Pins
 #define PIN_3LED_SE10 	PORTNUM2PIN(PC,7)
@@ -55,6 +54,9 @@
 #define CARD_DATA		PORTNUM2PIN(PB, 2)
 #define CARD_CLOCK		PORTNUM2PIN(PB, 3)
 #define CARD_ENABLE		PORTNUM2PIN(PB, 10)
+
+//debug pin
+#define PIN_DEBUG PORTNUM2PIN(PC,9)
 
 /*******************************************************************************
  ******************************************************************************/

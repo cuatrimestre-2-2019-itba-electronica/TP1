@@ -7,9 +7,7 @@
 #include "waiting_id_suceso_sources.h"
 
 #define GET_NUM_MAX 10
-#define DELAY_COUNT 4 //todo: fijarme bien este valor
-
-
+#define DELAY_COUNT 4
 
 union SUCESO_SOURCE_DATA;
 typedef union SUCESO_SOURCE_DATA SUCESO_SOURCE_DATA;
