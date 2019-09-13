@@ -20,7 +20,7 @@ Autor del ejemplo original: Nicolas Magliola
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define TIMER_TICK_US       10
+#define TIMER_TICK_US       100
 #define TIMER_US2TICKS(us)  ((us)/TIMER_TICK_US)
 
 

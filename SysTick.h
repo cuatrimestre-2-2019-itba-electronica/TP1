@@ -14,7 +14,7 @@
 
 
 
-#define SYSTICK_ISR_FREQUENCY_HZ 100000L
+#define SYSTICK_ISR_FREQUENCY_HZ 10000L
 #define NUMBER_OF_CALLBACKS 10
 typedef void (*SysTick_funcallback)(void);
 
