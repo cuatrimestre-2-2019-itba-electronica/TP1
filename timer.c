@@ -19,9 +19,9 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#if TIMER_TICK_MS != (1000U/SYSTICK_ISR_FREQUENCY_HZ)
+#if TIMER_TICK_US != (1000000U/SYSTICK_ISR_FREQUENCY_HZ)
 #error Las frecuencias no coinciden!!
-#endif // TIMER_TICK_MS != (1000U/SYSTICK_ISR_FREQUENCY_HZ)
+#endif
 
 
 /*******************************************************************************
@@ -64,9 +64,9 @@ void timerInit(void)
     static bool yaInit = false;
     if (yaInit)
         return;
-    
-    SysTick_Init(timer_isr); // init peripheral
-    
+
+    SysTick_Init(); // init peripheral
+    SysTick_append(timer_isr);
     yaInit = true;
 }
 
@@ -74,10 +74,10 @@ void timerInit(void)
 ticks_t timerStart(ticks_t ticks)
 {
     ticks_t now_copy;
-    
+
     if (ticks < 0)
         ticks = 0; // truncate min wait time
-    
+
     //disable_interrupts();
     now_copy = timer_main_counter; // esta copia debe ser atomic!!
     //enable_interrupts();
@@ -101,18 +101,6 @@ bool timerExpired(ticks_t timeout)
 }
 
 
-void timerDelay(ticks_t ticks)
-{
-    ticks_t tim;
-    
-    tim = timerStart(ticks);
-    while (!timerExpired(tim))
-    {
-        // wait...
-    }
-}
-
-
 /*******************************************************************************
  *******************************************************************************
                         LOCAL FUNCTION DEFINITIONS
@@ -126,3 +114,4 @@ static void timer_isr(void)
 
 
 /******************************************************************************/
+
