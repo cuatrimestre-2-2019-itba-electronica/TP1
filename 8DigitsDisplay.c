@@ -166,6 +166,10 @@ void _8DigitDisplay_SetBright(uint8_t b){
 	_7SegDisp_setBright(b);
 }
 
+void _8DigitDisplay_IncBright(void){
+	_7SegDisp_IncBright();
+}
+
 
 //	|	|	|	0|	|	|	3|	4|	|	|	7|
 

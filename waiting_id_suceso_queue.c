@@ -13,6 +13,7 @@
 
 
 
+
 //#define SUCESOS_VERBOSE
 #ifdef SUCESOS_VERBOSE
 const char * suc_debug_codes[] = \
@@ -44,7 +45,7 @@ const char * suc_debug_codes[] = \
 #define SUCESO_QUEUE_SIZE 20
 
 //Para el ring buffer
-UT_icd suceso_icd = {sizeof(suceso_t), NULL, NULL, NULL};
+UT_icd suceso_icd;
 
 
 typedef struct SUCESO_QUEUE {
@@ -65,6 +66,7 @@ void waiting_id_suceso_queue__init(SUCESO_QUEUE* self)
     }
 
     //creacion del buffer circular de sucesos (para la salida)
+    suceso_icd.sz = sizeof(suceso_t);
     utringbuffer_new(self->suceso_queue, SUCESO_QUEUE_SIZE, &suceso_icd);
     self->last_suceso = utringbuffer_front(self->suceso_queue);
 
@@ -128,7 +130,8 @@ void suceso_queue__destroy(SUCESO_QUEUE *self) {
 bool suceso_queue_push_back(SUCESO_QUEUE *self, suceso_t suceso){
     if(suceso != SUC_N)
     {
-        utringbuffer_push_back(self->suceso_queue, &suceso);
+    	suceso_t s = suceso;
+        utringbuffer_push_back(self->suceso_queue, &s);
         self->suceso_queue_size++;
         return true;
     }

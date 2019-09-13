@@ -251,3 +251,11 @@ uint8_t _7SegDisp_getCursorPos(void){
 	return cursorPos;
 }
 
+void _7SegDisp_IncBright(void){
+	static uint8_t currrBright=BRIGHT_LEVEL-1;
+	if(!(currrBright<BRIGHT_LEVEL)){
+		currrBright=0;
+	}
+	_7SegDisp_setBright(currrBright);
+	currrBright++;
+}

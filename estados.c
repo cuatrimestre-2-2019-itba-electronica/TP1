@@ -19,6 +19,7 @@
 #include "database.h"
 
 #include"8DigitsDisplay.h"
+#include "3LedDsip.h"
 
 
 
@@ -373,6 +374,7 @@ static estado_t * est_xx_ev_timeout(evento_t * ev){
 
 //ESTADO_WAITING_ID
 static estado_t * est_waiting_ID_ev_cor_num_input(evento_t * ev) {
+	_8DigitDisplay_reset();
     hash_t hash = database_get_hash(ev->correct_num_input.num_buff, ev->correct_num_input.num_buff_len);
     database_set_cursor_pos(database_get_pos_from_hash(true, hash));
 
@@ -390,6 +392,8 @@ static estado_t * est_waiting_ID_ev_fail_num_input(evento_t * ev) {
 
 //ESTADO_WAITING_PIN
 static estado_t * est_waiting_PIN_ev_cor_num_input(evento_t * ev){
+	_3LedDisp_setLed(0, true);
+	_7SegDisp_clearDisplay();
 	return estado__create(EST_GOT_ACCESS_TYPE, NULL);
 }
 
@@ -436,7 +440,6 @@ bool validate_PIN(uint8_t * ID_buffer, uint8_t ID_buffer_len){
 
 bool show_ID(uint8_t * ID_buffer, uint8_t ID_buffer_len, uint8_t cursor_pos)
 {
-
 	_8DigitDisplay_reset();
     _8DigitDisplay_cursorOn();
 	for (int i = 0; i < ID_buffer_len; ++i) {

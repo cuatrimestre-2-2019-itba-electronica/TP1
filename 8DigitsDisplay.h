@@ -12,6 +12,10 @@
 #include <stdint.h>
 
 #define AMAUNT_DIGITS_8_DISPLAY 8 //cantidad de digitos del display emulado
+#define _8DIGIT_BLANK 11
+#define _8DIGIT_GUION 10
+
+
 
 /**
  * @brief llama al initi del driver de los led 7 segmentos
@@ -57,9 +61,24 @@ void _8DigitDisplay_SetCursorPos2End(void);
  * @brief mueve el contenido del display para que el cursor aparesca en pantalla
  */
 void _8DigitDisplay_SetCursorPosOnScrenn(void);
+/**
+ * @brief shiftea el cursor a la izquierda
+ */
 void _8DigitDisplay_ShiftCursorLeft(void);
+/**
+ * @brief cuando es true pone guienes en donde no esta el cursor
+ */
 void _8DigitDisplay_PinMode(bool mode);
+
+/**
+ * @brief setea el brillo del display
+ */
 void _8DigitDisplay_SetBright(uint8_t b);
+/**
+ * @brief incrementa brillo y si me paso vuelve al principio
+ */
+
+void _8DigitDisplay_IncBright(void);
 
 
 

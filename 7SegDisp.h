@@ -63,4 +63,9 @@ void _7SegDisp_updateCursor(void);
  * @brief return cursor position
  */
 uint8_t _7SegDisp_getCursorPos(void);
+
+/**
+ * @brief incrementa brillo y si me paso vuelve al principio
+ */
+void _7SegDisp_IncBright(void);
 #endif // _DISPLAY_H_

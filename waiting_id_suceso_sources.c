@@ -7,13 +7,15 @@
 #include "waiting_id_suceso_sources.h"
 
 #define GET_NUM_MAX 10
-#define DELAYS_UNTIL_TIMEOUT 10 //todo: fijarme bien este valor
+#define DELAY_COUNT 4 //todo: fijarme bien este valor
+
 
 
 union SUCESO_SOURCE_DATA;
 typedef union SUCESO_SOURCE_DATA SUCESO_SOURCE_DATA;
 
 typedef suceso_t(*get_suceso_fun_p)(SUCESO_SOURCE_DATA * data, cqp_t cqp);
+
 
 /********************************************************
  * ******************************************************
@@ -38,9 +40,13 @@ suceso_t get_delay_fun(SUCESO_SOURCE_GET_DELAY_DATA * data, cqp_t cqp)
     {
         data->count++;
         if(data->count == data->max_count){
+        	data->count = 1;
             return SUC_DELAY;
         }
+    } else {
+    	data->count = 0;
     }
+
     return SUC_N;
 }
 
@@ -63,30 +69,19 @@ typedef struct SUCESO_SOURCE_GET_NUM_DATA
 
 suceso_t get_num_fun(SUCESO_SOURCE_GET_NUM_DATA * data, cqp_t cqp)
 {
-    // Si no esta swiping, lo unico relevante que puede pasar es
-    // que empiece a swipear
-    if(!data->swiping){
-        if(cqp == PASA_SWIPE_START){
-        data->swiping = true;
-        }
-        return SUC_N;
-    }
-
-    //Si esta swiping:
     switch (cqp)
     {
         case PASA_0: case PASA_1: case PASA_2:
         case PASA_3: case PASA_4: case PASA_5:
         case PASA_6: case PASA_7: case PASA_8:
         case PASA_9:
+        	data->swiping = true;
             return (suceso_t)cqp;
         case PASA_SWIPE_END:
             data->swiping = false;
             return SUC_SWIPE_END;
         case PASA_RIGHT: case PASA_LEFT:
         case PASA_PRESS: case PASA_RELEASE:
-        //si el usuario movio el encoder mientras pasaba la tarjeta:
-            return SUC_SWIPE_INTERRUPTED;
         default: case PASA_DELAY: case CQP_N:
             return SUC_N;
     }
@@ -115,16 +110,32 @@ typedef struct SUCESO_SOURCE_GET_TAP_DATA
     // && entremedio no se roto el encoder
     // && entremedio no hubo un delay
     bool tap_detected;
+
+    bool okey_sigo_apretado_pero_no_hay_tap__flag;
+
+    unsigned int delay_count;
 } SUCESO_SOURCE_GET_TAP_DATA;
 
 suceso_t get_tap_fun(SUCESO_SOURCE_GET_TAP_DATA * data, cqp_t cqp)
 {
+	if(cqp == PASA_DELAY){
+		if(++(data->delay_count) < 2){
+			return SUC_N;
+		} else {
+			data->delay_count = 0;
+		}
+	} else {
+		data->delay_count = 0;
+	}
+
+
     if(cqp == PASA_PRESS)
     {
         data->pressed = true;    //Se presiono el encoder
         data->tap_detected = false;
+        data->okey_sigo_apretado_pero_no_hay_tap__flag = false;
     }
-    else if(cqp == PASA_RELEASE && data->pressed)
+    else if(cqp == PASA_RELEASE && data->pressed && !data->okey_sigo_apretado_pero_no_hay_tap__flag)
     {
         data->pressed = false;
         data->tap_detected = true;
@@ -151,11 +162,24 @@ typedef struct SUCESO_SOURCE_GET_TAP
 typedef struct SUCESO_SOURCE_GET_CURSOR_MOVE_DATA
 {
     bool pressed;
+    bool okey_sigo_apretado_pero_no_te_muevas__flag;
     bool moving;
+    unsigned int delay_count;
 } SUCESO_SOURCE_GET_CURSOR_MOVE_DATA;
 
 suceso_t get_cursor_move_fun(SUCESO_SOURCE_GET_CURSOR_MOVE_DATA * data, cqp_t cqp)
 {
+	if(cqp == PASA_DELAY){
+		if(++(data->delay_count) < 2){
+			return SUC_N;
+		} else {
+			data->delay_count = 0;
+		}
+	} else {
+		data->delay_count = 0;
+	}
+
+
     // Si no esta apretado, lo unico relevante
     // que puede pasar es que
     // 1) se aprete
@@ -166,7 +190,10 @@ suceso_t get_cursor_move_fun(SUCESO_SOURCE_GET_CURSOR_MOVE_DATA * data, cqp_t cq
     // presiono.
     if(!data->pressed)
     {
-        if(cqp == PASA_PRESS){ data->pressed = true; return SUC_N; }
+        if(cqp == PASA_PRESS){
+        	data->pressed = true;
+        	data->okey_sigo_apretado_pero_no_te_muevas__flag = false;
+        	return SUC_N; }
         else if (cqp == PASA_RIGHT) { return SUC_SCROLL_DOWN; }
         else if (cqp == PASA_LEFT)  { return SUC_SCROLL_UP; }
     }
@@ -180,6 +207,12 @@ suceso_t get_cursor_move_fun(SUCESO_SOURCE_GET_CURSOR_MOVE_DATA * data, cqp_t cq
     // generador es equivalente a que se desaprete
     // * desapretarse
 
+    if(data->okey_sigo_apretado_pero_no_te_muevas__flag && cqp == PASA_RELEASE){
+    	data->pressed = false;
+    	data->okey_sigo_apretado_pero_no_te_muevas__flag = false;
+    	return;
+    }
+
     switch (cqp)
     {
         case PASA_RIGHT:
@@ -191,7 +224,7 @@ suceso_t get_cursor_move_fun(SUCESO_SOURCE_GET_CURSOR_MOVE_DATA * data, cqp_t cq
         case PASA_DELAY:
             if(!data->moving)
             {
-                data->pressed = false;
+                data->okey_sigo_apretado_pero_no_te_muevas__flag = true;
             }
             return SUC_N;
         case PASA_RELEASE: default:
@@ -215,10 +248,21 @@ typedef struct SUCESO_SOURCE_GET_CURSOR_MOVE
 typedef struct SUCESO_SOURCE_GET_INC_DISP_INT_DATA
 {
     bool pressed;
+    unsigned int delay_count;
 } SUCESO_SOURCE_GET_INC_DISP_INT_DATA;
 
 suceso_t get_inc_disp_int_fun(SUCESO_SOURCE_GET_INC_DISP_INT_DATA * data, cqp_t cqp)
 {
+	if(cqp == PASA_DELAY){
+		if(++(data->delay_count) < 2){
+			return SUC_N;
+		} else {
+			data->delay_count = 0;
+		}
+	} else {
+		data->delay_count = 0;
+	}
+
 
     // Si no esta apretado, lo unico relevante
     // que puede pasar es que se aprete.
@@ -239,7 +283,8 @@ suceso_t get_inc_disp_int_fun(SUCESO_SOURCE_GET_INC_DISP_INT_DATA * data, cqp_t 
     switch (cqp)
     {
         case PASA_DELAY:
-            return SUC_INC_DIS_INTENSITY;
+        	_8DigitDisplay_IncBright();
+            return SUC_DELAY;
         case PASA_RELEASE: default:
             data->pressed = false;
             return SUC_N;
@@ -310,19 +355,23 @@ void suceso_source__init(SUCESO_SOURCE* self, SUCESO_SOURCE_TYPE type)
             self->any.fun = (get_suceso_fun_p)get_tap_fun;
             self->get_tap.data.pressed = false;
             self->get_tap.data.tap_detected = false;
+            self->get_tap.data.delay_count = false;
             break;
         case SUCESO_SOURCE_GET_CURSOR_MOVE_TYPE:
             self->any.fun = (get_suceso_fun_p)get_cursor_move_fun;
             self->get_cursor_move.data.pressed = false;
+            self->get_cursor_move.data.okey_sigo_apretado_pero_no_te_muevas__flag = false;
             self->get_cursor_move.data.moving = false;
+            self->get_cursor_move.data.delay_count = false;
             break;
         case SUCESO_SOURCE_GET_INC_DISP_INT_TYPE:
             self->any.fun = (get_suceso_fun_p)get_inc_disp_int_fun;
             self->get_inc_disp_int.data.pressed = false;
+            self->get_inc_disp_int.data.delay_count = false;
             break;
         case SUCESO_SOURCE_GET_DELAY_TYPE:
             self->any.fun = (get_suceso_fun_p)get_delay_fun;
-            self->get_delay.data.max_count = DELAYS_UNTIL_TIMEOUT;
+            self->get_delay.data.max_count = DELAY_COUNT;
             break;
         default:
             self->type = SUCESO_SOURCE_TYPE_N;

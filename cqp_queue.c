@@ -5,10 +5,14 @@
 #include <stdio.h>
 #include "SysTick.h"
 #include "encoder.h"
+#include "config.h"
 #include "circular_buffer/utringbuffer.h"
+#include "magnetic_band.h"
 
-#define TIME_FREC 1
-#define TIME_PRESCALER (SYSTICK_ISR_FREQUENCY_HZ/TIME_FREC)
+#define TIME_FREC 2
+#define TIME_PRESCALER (SYSTICK_ISR_FREQUENCY_HZ / TIME_FREC)
+
+
 
 //#define CQP_VERBOSE
 
@@ -70,7 +74,6 @@ static cqp_t cqp[] =
 
 static unsigned int front = 0;
 static unsigned int cqp_queue_size = 0;
-static bool get_next = false;
 
 //Para el ring buffer
 UT_icd cqp_icd = {sizeof(cqp_t), NULL, NULL, NULL};
@@ -84,7 +87,8 @@ typedef struct CQP_QUEUE {
 }CQP_QUEUE;
 
 CQP_QUEUE q;
-
+//es true antes de inicializarse, y mientras se este usando
+static int is_q_busy = 1;
 
 
 static cqp_t cqp_queue_pop_front(CQP_QUEUE *self);
@@ -136,15 +140,19 @@ void cqp_queue__init(CQP_QUEUE * self)
 	self->last_cqp = utringbuffer_front(self->CQP_queue);
 	self->cqp_queue_size = 0;
 
+	is_q_busy = 0;
+
 	encoder_set_callback_CW(cqp_queue_input_CW);
 	encoder_set_callback_CCW(cqp_queue_input_CCW);
 	encoder_set_callback_SW_PRESS(cqp_queue_input_PRESS);
 	encoder_set_callback_SW_RELEASE(cqp_queue_input_RELEASE);
+
+	time_init();
 }
 
 CQP_QUEUE *cqp_queue__create() {
     cqp_queue__init(&q);
-//    time_init();
+    is_q_busy = 0;
     return &q;
 }
 
@@ -159,14 +167,21 @@ void cqp_queue_update(CQP_QUEUE *self) {
         cqp_queue_size++;
     }
 #else
-
+    if(is_loaded()){
+    	uint8_t data = get_data();
+    	if(data == UINT8_MAX){
+    		cqp_queue_push_back(&q, PASA_SWIPE_END);
+    	} else {
+    		cqp_queue_push_back(&q, (cqp_t) data);
+    	}
+    }
 #endif
 }
 
 void time_IRQ(void){
-	static uint32_t counter=0;
-	if((counter%=TIME_PRESCALER)==0){
-		get_next = true;
+	static uint32_t counter = 1;
+	if((counter %= TIME_PRESCALER)==0){
+		cqp_queue_push_back(&q, PASA_DELAY);
 	}
 	counter++;
 }
@@ -195,8 +210,11 @@ void cqp_queue_input_RELEASE(){
 static bool cqp_queue_push_back(CQP_QUEUE *self, cqp_t cqp ){
     if(cqp != CQP_N)
     {
+    	while(is_q_busy); //todo:segui aca
+    	is_q_busy = 1;
         utringbuffer_push_back(self->CQP_queue, &cqp);
         self->cqp_queue_size++;
+        is_q_busy = 0;
         return true;
     }
     return false;

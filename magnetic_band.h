@@ -20,17 +20,17 @@
   ////////////////////////////////////////////////////////////////////////////////////
  ///******************************************************************************///
 ////////////////////////////////////////////////////////////////////////////////////
-#define CARD_DATA		PORTNUM2PIN(PC, 5)
-#define CARD_CLOCK		PORTNUM2PIN(PC, 7)
-#define CARD_ENABLE		PORTNUM2PIN(PC, 0)
 #define PIN_SW3			PORTNUM2PIN(PA,4)//prueba
 #define PIN_SW2			PORTNUM2PIN(PC,6)//prueba
+#define DATA_LENGTH		8 //la cantidad de caracteres que se quieren recibir con get_data
+#define WORD_LENGTH		5 //tamano de la palabra con el bit de paridad
+#define PAIRITY_MASK 	0xEF
   ////////////////////////////////////////////////////////////////////////////////////
  ///******************************************************************************///
 ////////////////////////////////////////////////////////////////////////////////////
 void init_mag_card(void);//inicializa los pines que usara la tarjeta magetica
-void get_data(void); //devuelve caracter a caracter la informacion
-bool is_loaded(void); //indica si hay informacion que no se uso
+uint8_t get_data(void); //devuelve caracter a caracter la informacion
+bool is_loaded(void); //indica si hay informacion que no se uso, devuelve un 1 si esta cargado el buffer
 
 
 

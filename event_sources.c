@@ -27,6 +27,7 @@ bool scroll_down_ID_num(uint8_t * num);
  * ******************************************************
  * ******************************************************/
 
+
 /* Posibles eventos que devuelve:
     - EVENTO_FAILED_NUM_INPUT_TYPE
     - EVENTO_CORRECT_NUM_INPUT_TYPE */
@@ -40,6 +41,7 @@ typedef struct EVENTO_SOURCE_GET_NUM_BUFF_DATA
     uint8_t * num_buff;
     uint8_t cursor;
     bool changing_num;  //true si se esta cambiando el valor de un digito y todavia no se confirmo con un tap
+    bool swiping;  		//true si se esta cambiando el valor de un digito y todavia no se confirmo con un tap
 
     uint8_t max_length;
     uint8_t min_length; //todo: dejar de ignorar min_length
@@ -58,6 +60,7 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
 
     bool user_is_done = false;
 
+
     switch(suceso)
     {
         // ** si es un numero ** //
@@ -65,9 +68,20 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
         case SUC_NUM_3: case SUC_NUM_4: case SUC_NUM_5:
         case SUC_NUM_6: case SUC_NUM_7: case SUC_NUM_8:
         case SUC_NUM_9:
+        	if( !data->swiping){
+        		data->swiping = true;
+        		data->changing_num = false;
+        		data->cur_length = 0;
+        		data->cursor = 0;
+        		for(int i = 0; i < data->max_length; i++){
+        			data->num_buff[i];
+        		}
+        	}
             data->num_buff[data->cursor] = (uint8_t)suceso;
-            data->changing_num = true;
-            if(data->cursor >= data->cur_length) { data->cur_length = data->cursor + 1; }
+            if(data->cur_length < data->max_length){
+            	data->cur_length++;
+            	data->cursor++;
+            }
             break;
 
         // ** si es la modificacion de un numero por scroll ** //
@@ -75,7 +89,9 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
             // Si estoy en la ultima posicion y borre el numero (es decir, pase
             // de 0 a espacio o de ID_MAX_NUM a espacio), indico que el ID ahora
             // es mas corto
-
+        case SUC_SWIPE_END:
+        	user_is_done = true;
+        	break;
         case SUC_SCROLL_UP:
             if(scroll_up_ID_num(&(data->num_buff[data->cursor]))
                && (data->cursor + 1 == data->cur_length)){
@@ -87,7 +103,7 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
         case SUC_SCROLL_DOWN:
             if( scroll_down_ID_num(&(data->num_buff[data->cursor]))
                 && (data->cursor + 1 == data->cur_length)){
-                data->cur_length--;
+                data->cur_length--; //todo: esta mal hacer esto sin tap
             }
             data->changing_num = true;
             if(data->cursor >= data->cur_length) { data->cur_length = data->cursor + 1; }
@@ -100,9 +116,9 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
                 // ingresado y ademas la longitud total esta entre
                 // los limites permitidos por min_length y
                 // max_length
-                if(data->cursor == data->cur_length-1
-                && data->cursor >= data->min_length
-                && data->cursor <= data->max_length){
+                if(data->cursor == data->cur_length - 1
+                && data->cur_length >= data->min_length
+                && data->cur_length <= data->max_length){
                     user_is_done = true;
                 }
                 break;
@@ -110,7 +126,16 @@ get_num_buff_fun(EVENTO_SOURCE_GET_NUM_BUFF_DATA * data, suceso_t suceso)
             //SI ESTABA MODIFICANDO UN DIGITO:
             data->changing_num = false;
 
-            if(data->cursor == data->max_length - 1) {
+            //si puse un espacio en la ultima posicion escrita:
+            if(data->cursor == data->cur_length - 1
+            && data->num_buff[data->cursor] > ID_MAX_NUM){
+            	if(data->cursor) { data->cursor--; }
+            	data->cur_length--;
+            	break;
+            }
+
+            //si estoy en la ultima posicion permitida
+            if(data->cur_length == data->max_length) {
                 user_is_done = true;
             } else {
                 // si no es la ultima posicion permitida

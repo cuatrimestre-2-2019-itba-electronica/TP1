@@ -47,10 +47,15 @@
 #define PIN_SW3 PORTNUM2PIN(PA,4)     // ???
 
 //encoder
-
 #define PIN_ENCODER_A PORTNUM2PIN(PC,16)
 #define PIN_ENCODER_B PORTNUM2PIN(PC,17)
 #define PIN_ENCODER_C PORTNUM2PIN(PC,1)
+
+//tarjeta magnetica
+#define CARD_DATA		PORTNUM2PIN(PB, 2)
+#define CARD_CLOCK		PORTNUM2PIN(PB, 3)
+#define CARD_ENABLE		PORTNUM2PIN(PB, 10)
+
 /*******************************************************************************
  ******************************************************************************/
 
